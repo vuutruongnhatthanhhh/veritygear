@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 const COLUMNS = [
@@ -25,7 +26,7 @@ const COLUMNS = [
       { label: "Chính sách bảo hành", href: "#" },
       { label: "Đổi trả 30 ngày", href: "#" },
       { label: "Hướng dẫn mua hàng", href: "#" },
-      { label: "Liên hệ", href: "#" },
+      { label: "Liên hệ", href: "/lien-he" },
     ],
   },
 ];
@@ -36,9 +37,18 @@ export default function Footer() {
       <div className="mx-auto max-w-[1600px] px-6 py-16 sm:px-10 sm:py-20">
         <div className="grid grid-cols-2 gap-10 sm:grid-cols-2 md:grid-cols-5">
           <div className="col-span-2">
-            <span className="font-display text-xl font-bold tracking-[0.2em]">
-              VERITY<span className="text-paper/40">GEAR</span>
-            </span>
+            <div className="flex items-center gap-3">
+              <Image
+                src="/images/logo/logo-white.png"
+                alt=""
+                width={236}
+                height={100}
+                className="h-11 w-26 object-contain object-left"
+              />
+              <span className="font-display text-2xl font-bold tracking-[0.2em]">
+                VERITY<span className="text-paper/40">GEAR</span>
+              </span>
+            </div>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-paper/60">
               Phụ kiện gaming cao cấp — chế tác cho những game thủ không khoan
               nhượng. Chính xác. Bền bỉ. Đẳng cấp.

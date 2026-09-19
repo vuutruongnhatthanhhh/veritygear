@@ -4,6 +4,7 @@ import MissionStatement from "@/components/about/MissionStatement";
 import StoryBlock from "@/components/about/StoryBlock";
 import StatsRow from "@/components/about/StatsRow";
 import ValuesGrid from "@/components/about/ValuesGrid";
+import Team from "@/components/about/Team";
 import Gallery from "@/components/about/Gallery";
 import AboutCta from "@/components/about/AboutCta";
 
@@ -48,6 +49,7 @@ export default function AboutPage() {
         <StatsRow />
       </div>
       <ValuesGrid />
+      <Team />
       <Gallery />
       <AboutCta />
     </>
