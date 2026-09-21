@@ -28,41 +28,43 @@ const MILESTONES = [
 
 export default function Timeline() {
   return (
-    <section className="mx-auto max-w-5xl px-6 py-24 sm:px-10 sm:py-32">
-      <div className="mb-14">
-        <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.35em] text-ink/40">
-          Hành trình
-        </p>
-        <h2 className="max-w-lg font-display text-4xl font-bold uppercase leading-[1.05] sm:text-5xl">
-          Các cột mốc
-          <br />
-          đáng nhớ
-        </h2>
-      </div>
+    <section className="border-y border-ink/10 bg-ink/[0.035] px-6 py-24 sm:px-10 sm:py-32">
+      <div className="mx-auto max-w-5xl">
+        <div className="mb-14">
+          <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.35em] text-ink/40">
+            Hành trình
+          </p>
+          <h2 className="max-w-lg font-display text-4xl font-bold uppercase leading-[1.05] sm:text-5xl">
+            Các cột mốc
+            <br />
+            đáng nhớ
+          </h2>
+        </div>
 
-      <div className="relative">
-        <div className="absolute bottom-2 left-[27px] top-2 hidden w-px bg-ink/15 sm:block" />
-        <div className="space-y-6">
-          {MILESTONES.map((item) => (
-            <div key={item.year} className="relative flex gap-6 sm:gap-8">
-              <div className="hidden shrink-0 sm:flex sm:flex-col sm:items-center">
-                <div className="flex h-14 w-14 items-center justify-center border border-ink bg-paper text-[11px] font-bold text-ink">
-                  {item.year}
+        <div className="relative">
+          <div className="absolute bottom-2 left-[27px] top-2 hidden w-px bg-ink/50 sm:block" />
+          <div className="space-y-6">
+            {MILESTONES.map((item) => (
+              <div key={item.year} className="relative flex gap-6 sm:gap-8">
+                <div className="hidden shrink-0 sm:flex sm:flex-col sm:items-center">
+                  <div className="flex h-14 w-14 items-center justify-center border border-ink bg-[#efefee] text-[11px] font-bold text-ink">
+                    {item.year}
+                  </div>
+                </div>
+                <div className="flex-1 border border-ink/40 bg-[#efefee] p-6">
+                  <div className="mb-1 text-[11px] font-bold tracking-[0.2em] text-ink/50 sm:hidden">
+                    {item.year}
+                  </div>
+                  <h3 className="font-display text-lg font-bold uppercase tracking-wide">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 text-[15px] leading-relaxed text-ink/60">
+                    {item.desc}
+                  </p>
                 </div>
               </div>
-              <div className="flex-1 border border-ink/10 bg-ink/[0.03] p-6">
-                <div className="mb-1 text-[11px] font-bold tracking-[0.2em] text-ink/50 sm:hidden">
-                  {item.year}
-                </div>
-                <h3 className="font-display text-lg font-bold uppercase tracking-wide">
-                  {item.title}
-                </h3>
-                <p className="mt-2 text-[15px] leading-relaxed text-ink/60">
-                  {item.desc}
-                </p>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </section>

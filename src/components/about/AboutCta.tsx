@@ -14,7 +14,7 @@ export default function AboutCta() {
           xem game là một môn nghệ thuật.
         </p>
         <Link
-          href="/#san-pham"
+          href="/san-pham"
           className="mt-8 inline-flex h-13 items-center justify-center bg-ink px-9 text-[13px] font-semibold uppercase tracking-[0.14em] text-paper transition-transform hover:scale-[1.03]"
         >
           Khám phá bộ sưu tập

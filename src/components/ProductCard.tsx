@@ -1,28 +1,33 @@
 import Image from "next/image";
+import Link from "next/link";
 import type { Product } from "@/data/products";
 import { formatVnd } from "@/data/products";
 
 export default function ProductCard({ product }: { product: Product }) {
+  const href = `/san-pham/${product.slug}`;
+
   return (
     <div className="group relative flex flex-col">
       <div className="relative aspect-[4/5] overflow-hidden bg-ink/5">
-        <Image
-          src={product.image}
-          alt={product.name}
-          fill
-          sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-          className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-        />
+        <Link href={href} className="absolute inset-0 z-0" tabIndex={-1} aria-hidden="true">
+          <Image
+            src={product.image}
+            alt={product.name}
+            fill
+            sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+          />
+        </Link>
         {product.badge && (
-          <span className="absolute left-3 top-3 bg-ink px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-paper">
+          <span className="pointer-events-none absolute left-3 top-3 z-10 bg-ink px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-paper">
             {product.badge}
           </span>
         )}
-        <button className="absolute inset-x-3 bottom-3 translate-y-12 bg-paper py-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+        <button className="absolute inset-x-3 bottom-3 z-10 translate-y-12 bg-paper py-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
           Thêm vào giỏ
         </button>
       </div>
-      <div className="mt-4 flex items-start justify-between gap-2">
+      <Link href={href} className="mt-4 flex items-start justify-between gap-2">
         <div>
           <p className="text-[11px] uppercase tracking-[0.12em] text-ink/40">
             {product.category}
@@ -34,7 +39,7 @@ export default function ProductCard({ product }: { product: Product }) {
             {product.tagline}
           </p>
         </div>
-      </div>
+      </Link>
       <div className="mt-3 flex items-center gap-2">
         <span className="text-sm font-semibold">{formatVnd(product.price)}</span>
         {product.compareAtPrice && (

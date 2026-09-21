@@ -16,7 +16,7 @@ export default function FeaturedProducts() {
             </h2>
           </div>
           <Link
-            href="#"
+            href="/san-pham"
             className="group inline-flex items-center gap-2 text-[13px] font-semibold uppercase tracking-[0.12em] text-ink"
           >
             Xem toàn bộ cửa hàng

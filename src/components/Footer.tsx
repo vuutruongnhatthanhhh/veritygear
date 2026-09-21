@@ -5,10 +5,10 @@ const COLUMNS = [
   {
     title: "Sản phẩm",
     links: [
-      { label: "Bàn phím cơ", href: "/#san-pham" },
-      { label: "Chuột gaming", href: "/#san-pham" },
-      { label: "Tai nghe", href: "/#san-pham" },
-      { label: "Lót chuột", href: "/#san-pham" },
+      { label: "Bàn phím cơ", href: "/san-pham?danh-muc=ban-phim" },
+      { label: "Chuột gaming", href: "/san-pham?danh-muc=chuot" },
+      { label: "Tai nghe", href: "/san-pham?danh-muc=tai-nghe" },
+      { label: "Lót chuột", href: "/san-pham?danh-muc=lot-chuot" },
     ],
   },
   {
@@ -16,7 +16,7 @@ const COLUMNS = [
     links: [
       { label: "Giới thiệu", href: "/about" },
       { label: "Tuyển dụng", href: "#" },
-      { label: "Báo chí", href: "#" },
+      { label: "Tin tức", href: "/tin-tuc" },
       { label: "Đại lý", href: "#" },
     ],
   },
@@ -37,18 +37,13 @@ export default function Footer() {
       <div className="mx-auto max-w-[1600px] px-6 py-16 sm:px-10 sm:py-20">
         <div className="grid grid-cols-2 gap-10 sm:grid-cols-2 md:grid-cols-5">
           <div className="col-span-2">
-            <div className="flex items-center gap-3">
-              <Image
-                src="/images/logo/logo-white.png"
-                alt=""
-                width={236}
-                height={100}
-                className="h-11 w-26 object-contain object-left"
-              />
-              <span className="font-display text-2xl font-bold tracking-[0.2em]">
-                VERITY<span className="text-paper/40">GEAR</span>
-              </span>
-            </div>
+            <Image
+              src="/images/logo/logo-white.png"
+              alt="VERITY GEAR"
+              width={236}
+              height={100}
+              className="h-12 w-[113px] object-contain object-left"
+            />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-paper/60">
               Phụ kiện gaming cao cấp — chế tác cho những game thủ không khoan
               nhượng. Chính xác. Bền bỉ. Đẳng cấp.

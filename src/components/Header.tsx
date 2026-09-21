@@ -2,10 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const NAV_LINKS = [
-  { href: "/#san-pham", label: "Sản phẩm" },
+  { href: "/san-pham", label: "Sản phẩm" },
+  { href: "/tin-tuc", label: "Tin tức" },
   { href: "/cot-moc", label: "Cột mốc" },
   { href: "/about", label: "Giới thiệu" },
   { href: "/lien-he", label: "Liên hệ" },
@@ -13,7 +15,22 @@ const NAV_LINKS = [
 
 const MOBILE_NAV_LINKS = [{ href: "/", label: "Trang chủ" }, ...NAV_LINKS];
 
+// Routes whose first section is a full-bleed dark hero — only these get a
+// transparent header at scroll-top. Every other route (e.g. product detail
+// pages) starts on a light background, so the header must stay solid.
+const HERO_ROUTES = new Set([
+  "/",
+  "/about",
+  "/cot-moc",
+  "/lien-he",
+  "/san-pham",
+  "/tin-tuc",
+]);
+
 export default function Header() {
+  const pathname = usePathname();
+  const hasHero = HERO_ROUTES.has(pathname);
+
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -31,7 +48,7 @@ export default function Header() {
     };
   }, [open]);
 
-  const solid = scrolled || open;
+  const solid = !hasHero || scrolled || open;
 
   return (
     <>
@@ -43,40 +60,31 @@ export default function Header() {
       }`}
     >
       <div className="mx-auto flex h-16 max-w-[1600px] items-center justify-between gap-3 px-4 py-3 sm:h-18 sm:gap-6 sm:px-10 sm:py-4">
-        <Link href="/" className="flex min-w-0 shrink items-center gap-2 sm:shrink-0 sm:gap-3" aria-label="VERITY GEAR">
-          <span className="relative inline-block h-7 w-16.5 shrink-0 sm:h-11 sm:w-26">
-            <Image
-              src="/images/logo/logo-white.png"
-              alt=""
-              width={236}
-              height={100}
-              priority
-              className={`h-full w-full object-contain transition-opacity duration-500 ${
-                solid ? "opacity-0" : "opacity-100"
-              }`}
-            />
-            <Image
-              src="/images/logo/logo-dark.png"
-              alt=""
-              aria-hidden="true"
-              width={236}
-              height={100}
-              priority
-              className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-500 ${
-                solid ? "opacity-100" : "opacity-0"
-              }`}
-            />
-          </span>
-          <span
-            className={`truncate font-display text-base font-bold tracking-[0.12em] transition-colors duration-500 sm:text-2xl sm:tracking-[0.2em] ${
-              solid ? "text-ink" : "text-paper"
+        <Link href="/" className="relative inline-block h-9 w-[85px] shrink-0 sm:h-12 sm:w-[113px]" aria-label="VERITY GEAR">
+          <Image
+            src="/images/logo/logo-white.png"
+            alt="VERITY GEAR"
+            width={236}
+            height={100}
+            priority
+            className={`h-full w-full object-contain transition-opacity duration-500 ${
+              solid ? "opacity-0" : "opacity-100"
             }`}
-          >
-            VERITY<span className={solid ? "text-ink/40" : "text-paper/50"}>GEAR</span>
-          </span>
+          />
+          <Image
+            src="/images/logo/logo-dark.png"
+            alt=""
+            aria-hidden="true"
+            width={236}
+            height={100}
+            priority
+            className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-500 ${
+              solid ? "opacity-100" : "opacity-0"
+            }`}
+          />
         </Link>
 
-        <nav className="hidden items-center gap-10 md:flex">
+        <nav className="hidden items-center gap-6 md:flex lg:gap-10">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
