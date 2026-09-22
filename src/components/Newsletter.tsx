@@ -17,7 +17,7 @@ export default function Newsletter() {
             type="email"
             required
             placeholder="Email của bạn"
-            className="h-13 flex-1 border border-paper/25 bg-transparent px-5 text-sm text-paper placeholder:text-paper/40 focus:border-paper focus:outline-none"
+            className="h-13 w-full border border-paper/25 bg-transparent px-5 text-sm text-paper placeholder:text-paper/40 focus:border-paper focus:outline-none sm:flex-1"
           />
           <button
             type="submit"

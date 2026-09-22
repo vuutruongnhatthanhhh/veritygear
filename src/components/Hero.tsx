@@ -20,7 +20,7 @@ export default function Hero() {
           Bộ sưu tập 2026 — Precision Series
         </p>
         <h1
-          className="animate-fade-up max-w-3xl font-display text-[13vw] font-bold uppercase leading-[0.95] tracking-tight text-paper sm:text-[7vw] lg:text-[6vw]"
+          className="animate-fade-up max-w-3xl font-display text-[13vw] font-bold uppercase leading-[1.02] tracking-tight text-paper sm:text-[7vw] lg:text-[6vw]"
           style={{ animationDelay: "0.1s" }}
         >
           Unleash Your
@@ -45,7 +45,7 @@ export default function Hero() {
             Khám phá bộ sưu tập
           </Link>
           <Link
-            href="/about"
+            href="/gioi-thieu"
             className="inline-flex h-13 items-center justify-center border border-paper/40 px-8 text-[13px] font-semibold uppercase tracking-[0.14em] text-paper transition-colors hover:border-paper hover:bg-paper/10"
           >
             Câu chuyện thương hiệu

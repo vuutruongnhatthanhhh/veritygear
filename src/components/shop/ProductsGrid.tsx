@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { categories, products } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
@@ -10,10 +10,10 @@ const FILTERS = [{ slug: "tat-ca", name: "Tất cả" }, ...categories];
 export default function ProductsGrid() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const initial = searchParams.get("danh-muc") ?? "tat-ca";
-  const [active, setActive] = useState(
-    FILTERS.some((f) => f.slug === initial) ? initial : "tat-ca",
-  );
+  const requested = searchParams.get("danh-muc") ?? "tat-ca";
+  const active = FILTERS.some((f) => f.slug === requested)
+    ? requested
+    : "tat-ca";
 
   const filtered = useMemo(() => {
     if (active === "tat-ca") return products;
@@ -22,7 +22,6 @@ export default function ProductsGrid() {
   }, [active]);
 
   function handleFilter(slug: string) {
-    setActive(slug);
     const url = slug === "tat-ca" ? "/san-pham" : `/san-pham?danh-muc=${slug}`;
     router.replace(url, { scroll: false });
   }

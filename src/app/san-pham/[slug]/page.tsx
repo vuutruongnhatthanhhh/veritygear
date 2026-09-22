@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { products, formatVnd } from "@/data/products";
 import ProductActions from "@/components/product/ProductActions";
+import SpecsCard from "@/components/product/SpecsCard";
 import RelatedProducts from "@/components/product/RelatedProducts";
 import Newsletter from "@/components/Newsletter";
 
@@ -121,20 +122,7 @@ export default async function ProductDetailPage({
             </div>
 
             <div className="mt-10">
-              <h2 className="mb-4 text-[11px] font-semibold uppercase tracking-[0.35em] text-ink/40">
-                Thông số kỹ thuật
-              </h2>
-              <dl className="divide-y divide-ink/10 border-t border-ink/10">
-                {product.specs.map((spec) => (
-                  <div
-                    key={spec.label}
-                    className="grid grid-cols-2 gap-4 py-3.5 text-[14px]"
-                  >
-                    <dt className="text-ink/50">{spec.label}</dt>
-                    <dd className="font-medium text-ink">{spec.value}</dd>
-                  </div>
-                ))}
-              </dl>
+              <SpecsCard specs={product.specs} />
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { articles, newsCategories } from "@/data/news";
 import NewsCard from "./NewsCard";
@@ -10,10 +10,8 @@ const FILTERS = ["Tất cả", ...newsCategories];
 export default function NewsGrid() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const initial = searchParams.get("chu-de") ?? "Tất cả";
-  const [active, setActive] = useState(
-    FILTERS.includes(initial) ? initial : "Tất cả",
-  );
+  const requested = searchParams.get("chu-de") ?? "Tất cả";
+  const active = FILTERS.includes(requested) ? requested : "Tất cả";
 
   const filtered = useMemo(() => {
     if (active === "Tất cả") return articles;
@@ -21,7 +19,6 @@ export default function NewsGrid() {
   }, [active]);
 
   function handleFilter(category: string) {
-    setActive(category);
     const url =
       category === "Tất cả"
         ? "/tin-tuc"

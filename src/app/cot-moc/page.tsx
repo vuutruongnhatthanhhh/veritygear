@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import MilestonesHero from "@/components/milestones/MilestonesHero";
 import Timeline from "@/components/milestones/Timeline";
+import ProductLineup from "@/components/milestones/ProductLineup";
 import StatsRow from "@/components/about/StatsRow";
 import AboutCta from "@/components/about/AboutCta";
 
@@ -15,6 +16,7 @@ export default function MilestonesPage() {
     <>
       <MilestonesHero />
       <Timeline />
+      <ProductLineup />
       <StatsRow />
       <AboutCta />
     </>

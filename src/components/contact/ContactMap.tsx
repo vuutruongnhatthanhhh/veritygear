@@ -1,4 +1,4 @@
-const SOCIALS = ["Facebook", "Instagram", "TikTok", "YouTube"];
+import SocialLinks from "@/components/SocialLinks";
 
 export default function ContactMap() {
   return (
@@ -25,18 +25,7 @@ export default function ContactMap() {
         <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink/50">
           Theo dõi chúng tôi
         </p>
-        <div className="flex items-center gap-3">
-          {SOCIALS.map((s) => (
-            <a
-              key={s}
-              href="#"
-              aria-label={s}
-              className="flex h-10 w-10 items-center justify-center border border-ink/25 text-[10px] font-semibold uppercase tracking-wide text-ink/70 transition-colors hover:border-ink hover:text-ink"
-            >
-              {s.slice(0, 2)}
-            </a>
-          ))}
-        </div>
+        <SocialLinks variant="light" />
       </div>
     </div>
   );

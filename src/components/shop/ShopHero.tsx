@@ -17,7 +17,7 @@ export default function ShopHero() {
         <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.35em] text-paper/60">
           Cửa hàng
         </p>
-        <h1 className="max-w-2xl font-display text-5xl font-bold uppercase leading-[0.98] text-paper sm:text-7xl">
+        <h1 className="max-w-2xl font-display text-5xl font-bold uppercase leading-[1.28] text-paper sm:text-7xl">
           Toàn bộ
           <br />
           bộ sưu tập

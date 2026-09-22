@@ -4,12 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import SocialLinks from "./SocialLinks";
 
 const NAV_LINKS = [
   { href: "/san-pham", label: "Sản phẩm" },
-  { href: "/tin-tuc", label: "Tin tức" },
   { href: "/cot-moc", label: "Cột mốc" },
-  { href: "/about", label: "Giới thiệu" },
+  { href: "/gioi-thieu", label: "Giới thiệu" },
+  { href: "/tin-tuc", label: "Tin tức" },
   { href: "/lien-he", label: "Liên hệ" },
 ];
 
@@ -20,7 +21,7 @@ const MOBILE_NAV_LINKS = [{ href: "/", label: "Trang chủ" }, ...NAV_LINKS];
 // pages) starts on a light background, so the header must stay solid.
 const HERO_ROUTES = new Set([
   "/",
-  "/about",
+  "/gioi-thieu",
   "/cot-moc",
   "/lien-he",
   "/san-pham",
@@ -59,8 +60,8 @@ export default function Header() {
           : "border-b border-transparent bg-transparent"
       }`}
     >
-      <div className="mx-auto flex h-16 max-w-[1600px] items-center justify-between gap-3 px-4 py-3 sm:h-18 sm:gap-6 sm:px-10 sm:py-4">
-        <Link href="/" className="relative inline-block h-9 w-[85px] shrink-0 sm:h-12 sm:w-[113px]" aria-label="VERITY GEAR">
+      <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-3 px-4 py-3 sm:gap-6 sm:px-10 sm:py-4">
+        <Link href="/" className="relative inline-block h-12 w-28 shrink-0 sm:h-16 sm:w-38" aria-label="VERITY GEAR">
           <Image
             src="/images/logo/logo-white.png"
             alt="VERITY GEAR"
@@ -155,7 +156,7 @@ export default function Header() {
     </header>
 
     <nav
-      className={`fixed inset-x-0 top-16 bottom-0 z-40 flex flex-col justify-between bg-paper px-6 py-8 transition-opacity duration-300 sm:top-18 md:hidden ${
+      className={`fixed inset-x-0 top-18 bottom-0 z-40 flex flex-col justify-between bg-paper px-6 py-8 transition-opacity duration-300 sm:top-24 md:hidden ${
         open ? "opacity-100" : "pointer-events-none opacity-0"
       }`}
     >
@@ -171,18 +172,7 @@ export default function Header() {
           </Link>
         ))}
       </div>
-      <div className="flex gap-4">
-        {["Facebook", "Instagram", "TikTok", "YouTube"].map((s) => (
-          <a
-            key={s}
-            href="#"
-            aria-label={s}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-ink/20 text-[10px] font-semibold uppercase tracking-wide text-ink/70"
-          >
-            {s.slice(0, 2)}
-          </a>
-        ))}
-      </div>
+      <SocialLinks variant="light" />
     </nav>
     </>
   );

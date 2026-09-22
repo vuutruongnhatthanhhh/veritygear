@@ -26,7 +26,7 @@ export default function BrandStoryTeaser() {
           nghiệp — không thỏa hiệp giữa hiệu năng và vẻ đẹp tối giản.
         </p>
         <Link
-          href="/about"
+          href="/gioi-thieu"
           className="mt-8 inline-flex w-fit items-center gap-2 border-b-2 border-ink pb-1 text-[13px] font-semibold uppercase tracking-[0.12em] text-ink transition-opacity hover:opacity-60"
         >
           Đọc câu chuyện thương hiệu →
