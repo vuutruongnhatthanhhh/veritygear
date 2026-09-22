@@ -14,13 +14,13 @@ export default function BrandStoryTeaser() {
         />
       </div>
       <div className="order-1 flex flex-col justify-center px-6 py-16 sm:px-14 md:order-2 md:py-0">
-        <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.35em] text-ink/40">
+        <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.35em] text-ink">
           Câu chuyện của chúng tôi
         </p>
         <h2 className="max-w-md font-display text-3xl font-bold uppercase leading-[1.1] sm:text-4xl">
           Chế tác cho những kẻ không khoan nhượng
         </h2>
-        <p className="mt-6 max-w-md text-[15px] leading-relaxed text-ink/60">
+        <p className="mt-6 max-w-md text-[15px] leading-relaxed text-ink">
           VERITY GEAR ra đời từ nỗi ám ảnh với sự chính xác. Mỗi sản phẩm là
           kết quả của hàng trăm giờ thử nghiệm cùng các tuyển thủ chuyên
           nghiệp — không thỏa hiệp giữa hiệu năng và vẻ đẹp tối giản.

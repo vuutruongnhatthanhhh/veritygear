@@ -21,7 +21,7 @@ export default function ContactFaq() {
   return (
     <section className="mx-auto max-w-5xl px-6 py-24 sm:px-10 sm:py-32">
       <div className="mb-14 text-center">
-        <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.35em] text-ink/40">
+        <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.35em] text-ink">
           Giải đáp nhanh
         </p>
         <h2 className="font-display text-4xl font-bold uppercase leading-[1.05] sm:text-5xl">

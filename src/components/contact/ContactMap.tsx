@@ -3,7 +3,7 @@ import SocialLinks from "@/components/SocialLinks";
 export default function ContactMap() {
   return (
     <div>
-      <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.35em] text-ink/40">
+      <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.35em] text-ink">
         Vị trí cửa hàng
       </p>
       <div className="overflow-hidden border border-ink/15">

@@ -7,7 +7,7 @@ export default function CategoryGrid() {
     <section id="danh-muc" className="mx-auto max-w-[1600px] px-6 py-24 sm:px-10 sm:py-32">
       <div className="mb-14 flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
         <div>
-          <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.35em] text-ink/40">
+          <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.35em] text-ink">
             Danh mục
           </p>
           <h2 className="max-w-lg font-display text-4xl font-bold uppercase leading-[1.05] sm:text-5xl">
@@ -16,7 +16,7 @@ export default function CategoryGrid() {
             của bạn
           </h2>
         </div>
-        <p className="max-w-sm text-sm leading-relaxed text-ink/55">
+        <p className="max-w-sm text-sm leading-relaxed text-ink">
           Từ bàn phím cơ đến tai nghe âm trường vòm — mỗi sản phẩm đều được
           kiểm định qua hàng nghìn giờ thi đấu thực tế.
         </p>

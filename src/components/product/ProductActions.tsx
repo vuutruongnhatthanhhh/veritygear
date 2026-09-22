@@ -1,12 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import type { Product } from "@/data/products";
+import { useCart } from "@/components/providers/CartProvider";
 
-export default function ProductActions() {
+export default function ProductActions({ product }: { product: Product }) {
+  const { addItem } = useCart();
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
 
   function handleAdd() {
+    addItem(product.slug, qty);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   }

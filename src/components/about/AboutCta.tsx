@@ -9,7 +9,7 @@ export default function AboutCta() {
           <br />
           trải nghiệm của bạn?
         </h2>
-        <p className="mt-5 max-w-md text-[15px] leading-relaxed text-ink/60">
+        <p className="mt-5 max-w-md text-[15px] leading-relaxed text-ink">
           Khám phá toàn bộ bộ sưu tập VERITY GEAR — được chế tác cho những ai
           xem game là một môn nghệ thuật.
         </p>

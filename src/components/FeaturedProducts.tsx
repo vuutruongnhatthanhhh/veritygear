@@ -8,7 +8,7 @@ export default function FeaturedProducts() {
       <div className="mx-auto max-w-[1600px]">
         <div className="mb-14 flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
           <div>
-            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.35em] text-ink/40">
+            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.35em] text-ink">
               Best sellers
             </p>
             <h2 className="max-w-lg font-display text-4xl font-bold uppercase leading-[1.05] sm:text-5xl">

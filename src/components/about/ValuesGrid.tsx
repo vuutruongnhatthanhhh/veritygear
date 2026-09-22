@@ -33,7 +33,7 @@ export default function ValuesGrid() {
   return (
     <section className="mx-auto max-w-[1600px] px-6 py-24 sm:px-10 sm:py-32">
       <div className="mb-14">
-        <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.35em] text-ink/40">
+        <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.35em] text-ink">
           Giá trị cốt lõi
         </p>
         <h2 className="max-w-lg font-display text-4xl font-bold uppercase leading-[1.05] sm:text-5xl">
@@ -61,7 +61,7 @@ export default function ValuesGrid() {
             <h3 className="font-display text-base font-bold uppercase tracking-wide">
               {v.title}
             </h3>
-            <p className="text-[14px] leading-relaxed text-ink/55">{v.desc}</p>
+            <p className="text-[14px] leading-relaxed text-ink">{v.desc}</p>
           </div>
         ))}
       </div>

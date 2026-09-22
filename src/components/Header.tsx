@@ -5,6 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import SocialLinks from "./SocialLinks";
+import SearchOverlay from "./SearchOverlay";
+import { useCart } from "./providers/CartProvider";
 
 const NAV_LINKS = [
   { href: "/san-pham", label: "Sản phẩm" },
@@ -31,9 +33,12 @@ const HERO_ROUTES = new Set([
 export default function Header() {
   const pathname = usePathname();
   const hasHero = HERO_ROUTES.has(pathname);
+  const { itemCount } = useCart();
 
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [lang, setLang] = useState<"vi" | "en">("vi");
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -100,9 +105,37 @@ export default function Header() {
         </nav>
 
         <div className="flex shrink-0 items-center gap-3 sm:gap-5">
+          <div
+            className={`hidden items-center gap-1.5 text-[12px] font-semibold tracking-[0.06em] transition-colors duration-500 sm:flex ${
+              solid ? "text-ink/70" : "text-paper/80"
+            }`}
+          >
+            <button
+              type="button"
+              onClick={() => setLang("vi")}
+              aria-pressed={lang === "vi"}
+              className={`transition-opacity ${
+                lang === "vi" ? "opacity-100" : "opacity-50 hover:opacity-80"
+              }`}
+            >
+              VI
+            </button>
+            <span className="opacity-30">/</span>
+            <button
+              type="button"
+              onClick={() => setLang("en")}
+              aria-pressed={lang === "en"}
+              className={`transition-opacity ${
+                lang === "en" ? "opacity-100" : "opacity-50 hover:opacity-80"
+              }`}
+            >
+              EN
+            </button>
+          </div>
           <button
             aria-label="Tìm kiếm"
-            className={`hidden transition-colors duration-500 sm:block ${
+            onClick={() => setSearchOpen(true)}
+            className={`transition-colors duration-500 ${
               solid ? "text-ink/70 hover:text-ink" : "text-paper/80 hover:text-paper"
             }`}
           >
@@ -111,7 +144,8 @@ export default function Header() {
               <path d="m21 21-4.3-4.3" />
             </svg>
           </button>
-          <button
+          <Link
+            href="/gio-hang"
             aria-label="Giỏ hàng"
             className={`relative transition-colors duration-500 ${
               solid ? "text-ink/70 hover:text-ink" : "text-paper/80 hover:text-paper"
@@ -122,14 +156,16 @@ export default function Header() {
               <path d="M3 6h18" />
               <path d="M16 10a4 4 0 0 1-8 0" />
             </svg>
-            <span
-              className={`absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-semibold transition-colors duration-500 ${
-                solid ? "bg-ink text-paper" : "bg-paper text-ink"
-              }`}
-            >
-              0
-            </span>
-          </button>
+            {itemCount > 0 && (
+              <span
+                className={`absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-semibold transition-colors duration-500 ${
+                  solid ? "bg-ink text-paper" : "bg-paper text-ink"
+                }`}
+              >
+                {itemCount}
+              </span>
+            )}
+          </Link>
           <button
             aria-label="Menu"
             onClick={() => setOpen((v) => !v)}
@@ -172,8 +208,31 @@ export default function Header() {
           </Link>
         ))}
       </div>
-      <SocialLinks variant="light" />
+      <div className="flex flex-col gap-6">
+        <div className="flex items-center gap-3 text-[13px] font-semibold uppercase tracking-[0.12em] text-ink">
+          <button
+            type="button"
+            onClick={() => setLang("vi")}
+            aria-pressed={lang === "vi"}
+            className={lang === "vi" ? "opacity-100" : "opacity-40"}
+          >
+            Tiếng Việt
+          </button>
+          <span className="opacity-30">/</span>
+          <button
+            type="button"
+            onClick={() => setLang("en")}
+            aria-pressed={lang === "en"}
+            className={lang === "en" ? "opacity-100" : "opacity-40"}
+          >
+            English
+          </button>
+        </div>
+        <SocialLinks variant="light" />
+      </div>
     </nav>
+
+    <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   );
 }

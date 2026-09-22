@@ -56,7 +56,7 @@ export default function FeatureStrip() {
             <h3 className="font-display text-sm font-bold uppercase tracking-[0.1em]">
               {f.title}
             </h3>
-            <p className="text-[13px] leading-relaxed text-ink/55">{f.desc}</p>
+            <p className="text-[13px] leading-relaxed text-ink">{f.desc}</p>
           </div>
         ))}
       </div>

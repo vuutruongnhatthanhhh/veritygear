@@ -16,7 +16,7 @@ export default function ContactForm() {
 
   return (
     <div>
-      <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.35em] text-ink/40">
+      <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.35em] text-ink">
         Gửi tin nhắn
       </p>
       <h2 className="mb-3 font-display text-3xl font-bold uppercase leading-tight sm:text-4xl">

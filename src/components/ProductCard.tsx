@@ -1,10 +1,22 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import type { Product } from "@/data/products";
 import { formatVnd } from "@/data/products";
+import { useCart } from "@/components/providers/CartProvider";
 
 export default function ProductCard({ product }: { product: Product }) {
   const href = `/san-pham/${product.slug}`;
+  const { addItem } = useCart();
+  const [added, setAdded] = useState(false);
+
+  function handleAdd() {
+    addItem(product.slug, 1);
+    setAdded(true);
+    setTimeout(() => setAdded(false), 2000);
+  }
 
   return (
     <div className="group relative flex flex-col">
@@ -23,19 +35,22 @@ export default function ProductCard({ product }: { product: Product }) {
             {product.badge}
           </span>
         )}
-        <button className="absolute inset-x-3 bottom-3 z-10 translate-y-12 bg-paper py-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-          Thêm vào giỏ
+        <button
+          type="button"
+          onClick={handleAdd}
+          className={`absolute inset-x-3 bottom-3 z-10 bg-paper py-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 ${
+            added ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
+          }`}
+        >
+          {added ? "Đã thêm vào giỏ ✓" : "Thêm vào giỏ"}
         </button>
       </div>
       <Link href={href} className="mt-4 flex items-start justify-between gap-2">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.12em] text-ink/40">
-            {product.category}
-          </p>
-          <h3 className="mt-1 font-display text-base font-bold uppercase tracking-wide">
+          <h3 className="font-display text-base font-bold uppercase tracking-wide">
             {product.name}
           </h3>
-          <p className="mt-1 text-[13px] leading-snug text-ink/55">
+          <p className="mt-1 text-[13px] leading-snug text-ink">
             {product.tagline}
           </p>
         </div>

@@ -107,7 +107,7 @@ export default async function ProductDetailPage({
             </p>
 
             <div className="mt-8">
-              <ProductActions />
+              <ProductActions product={product} />
             </div>
 
             <div className="mt-10 grid grid-cols-1 gap-4 border-y border-ink/10 py-6 sm:grid-cols-3">

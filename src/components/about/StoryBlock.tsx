@@ -33,13 +33,13 @@ export default function StoryBlock({
         />
       </div>
       <div className={reverse ? "md:order-1" : ""}>
-        <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.35em] text-ink/40">
+        <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.35em] text-ink">
           {eyebrow}
         </p>
         <h3 className="max-w-md font-display text-2xl font-bold uppercase leading-[1.15] sm:text-3xl">
           {title}
         </h3>
-        <p className="mt-5 max-w-md text-[15px] leading-relaxed text-ink/60">
+        <p className="mt-5 max-w-md text-[15px] leading-relaxed text-ink">
           {desc}
         </p>
       </div>

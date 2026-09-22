@@ -1,7 +1,7 @@
 export default function MissionStatement() {
   return (
     <section className="mx-auto max-w-4xl px-6 py-24 text-center sm:py-32">
-      <p className="mb-6 text-[11px] font-semibold uppercase tracking-[0.35em] text-ink/40">
+      <p className="mb-6 text-[11px] font-semibold uppercase tracking-[0.35em] text-ink">
         Sứ mệnh
       </p>
       <p className="font-display text-2xl font-medium leading-snug tracking-tight sm:text-4xl">
