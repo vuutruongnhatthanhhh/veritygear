@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import type { Article } from "@/data/news";
 import { formatArticleDate } from "@/data/news";
 

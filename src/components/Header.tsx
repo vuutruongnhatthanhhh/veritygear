@@ -1,26 +1,30 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import SocialLinks from "./SocialLinks";
 import SearchOverlay from "./SearchOverlay";
 import { useCart } from "./providers/CartProvider";
+import { createClient } from "@/lib/supabase/client";
 
+// Nav hrefs stay the literal Vietnamese slugs in both locales (agreed SEO
+// strategy) — only the visible label is translated, via the `nav` messages
+// namespace.
 const NAV_LINKS = [
-  { href: "/san-pham", label: "Sản phẩm" },
-  { href: "/cot-moc", label: "Cột mốc" },
-  { href: "/gioi-thieu", label: "Giới thiệu" },
-  { href: "/tin-tuc", label: "Tin tức" },
-  { href: "/lien-he", label: "Liên hệ" },
-];
-
-const MOBILE_NAV_LINKS = [{ href: "/", label: "Trang chủ" }, ...NAV_LINKS];
+  { href: "/san-pham", key: "sanPham" },
+  { href: "/cot-moc", key: "cotMoc" },
+  { href: "/gioi-thieu", key: "gioiThieu" },
+  { href: "/tin-tuc", key: "tinTuc" },
+  { href: "/lien-he", key: "lienHe" },
+] as const;
 
 // Routes whose first section is a full-bleed dark hero — only these get a
 // transparent header at scroll-top. Every other route (e.g. product detail
 // pages) starts on a light background, so the header must stay solid.
+// `usePathname()` from `@/i18n/navigation` already returns the locale-stripped
+// pathname, so this Set doesn't need a `/en` variant.
 const HERO_ROUTES = new Set([
   "/",
   "/gioi-thieu",
@@ -34,11 +38,23 @@ export default function Header() {
   const pathname = usePathname();
   const hasHero = HERO_ROUTES.has(pathname);
   const { itemCount } = useCart();
+  const locale = useLocale();
+  const router = useRouter();
+  const t = useTranslations("nav");
 
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [lang, setLang] = useState<"vi" | "en">("vi");
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => setLoggedIn(!!data.user));
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      setLoggedIn(!!session?.user);
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -53,6 +69,10 @@ export default function Header() {
       document.body.style.overflow = "";
     };
   }, [open]);
+
+  function switchLocale(nextLocale: "vi" | "en") {
+    router.replace(pathname, { locale: nextLocale });
+  }
 
   const solid = !hasHero || scrolled || open;
 
@@ -99,7 +119,7 @@ export default function Header() {
                 solid ? "text-ink/70 hover:text-ink" : "text-paper/80 hover:text-paper"
               }`}
             >
-              {link.label}
+              {t(link.key)}
             </Link>
           ))}
         </nav>
@@ -112,10 +132,10 @@ export default function Header() {
           >
             <button
               type="button"
-              onClick={() => setLang("vi")}
-              aria-pressed={lang === "vi"}
+              onClick={() => switchLocale("vi")}
+              aria-pressed={locale === "vi"}
               className={`transition-opacity ${
-                lang === "vi" ? "opacity-100" : "opacity-50 hover:opacity-80"
+                locale === "vi" ? "opacity-100" : "opacity-50 hover:opacity-80"
               }`}
             >
               VI
@@ -123,17 +143,17 @@ export default function Header() {
             <span className="opacity-30">/</span>
             <button
               type="button"
-              onClick={() => setLang("en")}
-              aria-pressed={lang === "en"}
+              onClick={() => switchLocale("en")}
+              aria-pressed={locale === "en"}
               className={`transition-opacity ${
-                lang === "en" ? "opacity-100" : "opacity-50 hover:opacity-80"
+                locale === "en" ? "opacity-100" : "opacity-50 hover:opacity-80"
               }`}
             >
               EN
             </button>
           </div>
           <button
-            aria-label="Tìm kiếm"
+            aria-label={t("search")}
             onClick={() => setSearchOpen(true)}
             className={`transition-colors duration-500 ${
               solid ? "text-ink/70 hover:text-ink" : "text-paper/80 hover:text-paper"
@@ -145,8 +165,20 @@ export default function Header() {
             </svg>
           </button>
           <Link
+            href={loggedIn ? "/tai-khoan" : "/dang-nhap"}
+            aria-label={loggedIn ? t("account") : t("login")}
+            className={`transition-colors duration-500 ${
+              solid ? "text-ink/70 hover:text-ink" : "text-paper/80 hover:text-paper"
+            }`}
+          >
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+              <circle cx="12" cy="8" r="4" />
+              <path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8" />
+            </svg>
+          </Link>
+          <Link
             href="/gio-hang"
-            aria-label="Giỏ hàng"
+            aria-label={t("cart")}
             className={`relative transition-colors duration-500 ${
               solid ? "text-ink/70 hover:text-ink" : "text-paper/80 hover:text-paper"
             }`}
@@ -167,7 +199,7 @@ export default function Header() {
             )}
           </Link>
           <button
-            aria-label="Menu"
+            aria-label={t("menu")}
             onClick={() => setOpen((v) => !v)}
             className="flex flex-col gap-[5px] md:hidden"
           >
@@ -197,33 +229,47 @@ export default function Header() {
       }`}
     >
       <div className="flex flex-col">
-        {MOBILE_NAV_LINKS.map((link) => (
+        <Link
+          href="/"
+          onClick={() => setOpen(false)}
+          className="border-b border-ink/10 py-5 font-display text-2xl font-bold uppercase tracking-wide text-ink"
+        >
+          {t("trangChu")}
+        </Link>
+        {NAV_LINKS.map((link) => (
           <Link
             key={link.href}
             href={link.href}
             onClick={() => setOpen(false)}
             className="border-b border-ink/10 py-5 font-display text-2xl font-bold uppercase tracking-wide text-ink"
           >
-            {link.label}
+            {t(link.key)}
           </Link>
         ))}
+        <Link
+          href={loggedIn ? "/tai-khoan" : "/dang-nhap"}
+          onClick={() => setOpen(false)}
+          className="border-b border-ink/10 py-5 font-display text-2xl font-bold uppercase tracking-wide text-ink"
+        >
+          {loggedIn ? t("account") : t("login")}
+        </Link>
       </div>
       <div className="flex flex-col gap-6">
         <div className="flex items-center gap-3 text-[13px] font-semibold uppercase tracking-[0.12em] text-ink">
           <button
             type="button"
-            onClick={() => setLang("vi")}
-            aria-pressed={lang === "vi"}
-            className={lang === "vi" ? "opacity-100" : "opacity-40"}
+            onClick={() => switchLocale("vi")}
+            aria-pressed={locale === "vi"}
+            className={locale === "vi" ? "opacity-100" : "opacity-40"}
           >
             Tiếng Việt
           </button>
           <span className="opacity-30">/</span>
           <button
             type="button"
-            onClick={() => setLang("en")}
-            aria-pressed={lang === "en"}
-            className={lang === "en" ? "opacity-100" : "opacity-40"}
+            onClick={() => switchLocale("en")}
+            aria-pressed={locale === "en"}
+            className={locale === "en" ? "opacity-100" : "opacity-40"}
           >
             English
           </button>

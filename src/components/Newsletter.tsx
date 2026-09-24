@@ -1,32 +1,35 @@
-export default function Newsletter() {
+import { getLocale, getTranslations } from "next-intl/server";
+import { createClient } from "@/lib/supabase/server";
+import { NewsletterForm } from "./newsletter/NewsletterForm";
+
+const FALLBACK = {
+  eyebrow_vi: "Vòng tròn nội bộ",
+  eyebrow_en: "Inner circle",
+  heading_vi: "Nhận ưu đãi trước tiên",
+  heading_en: "Be the first to know",
+  body_vi: "Đăng ký để nhận thông tin drop giới hạn, ưu đãi độc quyền và tin tức mới nhất từ VERITY GEAR.",
+  body_en: "Sign up for limited drops, exclusive offers, and the latest news from VERITY GEAR.",
+};
+
+export default async function Newsletter() {
+  const locale = await getLocale();
+  const t = await getTranslations("newsletter");
+  const supabase = await createClient();
+  const { data } = await supabase.from("home_newsletter").select("*").eq("id", 1).single();
+  const newsletter = { ...FALLBACK, ...data };
+
+  const pick = (vi: string, en: string) => (locale === "en" ? en || vi : vi);
+
   return (
-    <section className="bg-ink py-24 sm:py-32">
-      <div className="mx-auto flex max-w-2xl flex-col items-center px-6 text-center">
-        <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.35em] text-paper/50">
-          Vòng tròn nội bộ
-        </p>
-        <h2 className="font-display text-3xl font-bold uppercase leading-[1.1] text-paper sm:text-4xl">
-          Nhận ưu đãi trước tiên
-        </h2>
-        <p className="mt-5 max-w-md text-[15px] leading-relaxed text-paper/60">
-          Đăng ký để nhận thông tin drop giới hạn, ưu đãi độc quyền và tin tức
-          mới nhất từ VERITY GEAR.
-        </p>
-        <form className="mt-8 flex w-full max-w-md flex-col gap-3 sm:flex-row">
-          <input
-            type="email"
-            required
-            placeholder="Email của bạn"
-            className="h-13 w-full border border-paper/25 bg-transparent px-5 text-sm text-paper placeholder:text-paper/40 focus:border-paper focus:outline-none sm:flex-1"
-          />
-          <button
-            type="submit"
-            className="h-13 shrink-0 bg-paper px-7 text-[13px] font-semibold uppercase tracking-[0.14em] text-ink transition-transform hover:scale-[1.03]"
-          >
-            Đăng ký
-          </button>
-        </form>
-      </div>
-    </section>
+    <NewsletterForm
+      eyebrow={pick(newsletter.eyebrow_vi, newsletter.eyebrow_en)}
+      heading={pick(newsletter.heading_vi, newsletter.heading_en)}
+      body={pick(newsletter.body_vi, newsletter.body_en)}
+      subscribedLabel={t("subscribed")}
+      placeholder={t("placeholder")}
+      submitLabel={t("submit")}
+      submittingLabel={t("submitting")}
+      errorLabel={t("error")}
+    />
   );
 }

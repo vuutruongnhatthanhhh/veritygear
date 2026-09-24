@@ -1,0 +1,55 @@
+{
+  "metadata": {
+    "title": "VERITY GEAR — Premium Gaming Gear",
+    "description": "VERITY GEAR — a premium gaming accessories brand: mechanical keyboards, mice, headsets, and mousepads crafted for gamers who refuse to compromise."
+  },
+  "nav": {
+    "sanPham": "Products",
+    "cotMoc": "Milestones",
+    "gioiThieu": "About",
+    "tinTuc": "News",
+    "lienHe": "Contact",
+    "trangChu": "Home",
+    "search": "Search",
+    "cart": "Cart",
+    "menu": "Menu",
+    "close": "Close",
+    "account": "Account",
+    "login": "Login"
+  },
+  "footer": {
+    "productsTitle": "Products",
+    "banPhim": "Mechanical keyboards",
+    "chuot": "Gaming mice",
+    "taiNghe": "Headsets",
+    "lotChuot": "Mousepads",
+    "tayCam": "Controllers",
+    "companyTitle": "Company",
+    "supportTitle": "Support",
+    "tagline": "Premium gaming gear — crafted for gamers who refuse to compromise. Precise. Durable. Elite.",
+    "designedBy": "Web design:"
+  },
+  "hero": {
+    "scrollHint": "Scroll down"
+  },
+  "testimonials": {
+    "heading": "What gamers say",
+    "ratingSummary": "4.9/5 · 3,200+ reviews"
+  },
+  "newsletter": {
+    "subscribed": "Thanks for subscribing!",
+    "placeholder": "Your email",
+    "submit": "Subscribe",
+    "submitting": "Sending...",
+    "error": "Something went wrong, please try again."
+  },
+  "aboutValues": {
+    "eyebrow": "Core values",
+    "headingLine1": "What we",
+    "headingLine2": "stand for"
+  },
+  "aboutTeam": {
+    "eyebrow": "Team",
+    "heading": "The people behind VERITY GEAR"
+  }
+}

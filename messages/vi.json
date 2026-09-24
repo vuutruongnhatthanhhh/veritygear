@@ -1,0 +1,55 @@
+{
+  "metadata": {
+    "title": "VERITY GEAR — Phụ Kiện Gaming Cao Cấp",
+    "description": "VERITY GEAR — thương hiệu phụ kiện gaming cao cấp: bàn phím cơ, chuột, tai nghe và lót chuột được chế tác cho những game thủ không khoan nhượng."
+  },
+  "nav": {
+    "sanPham": "Sản phẩm",
+    "cotMoc": "Cột mốc",
+    "gioiThieu": "Giới thiệu",
+    "tinTuc": "Tin tức",
+    "lienHe": "Liên hệ",
+    "trangChu": "Trang chủ",
+    "search": "Tìm kiếm",
+    "cart": "Giỏ hàng",
+    "menu": "Menu",
+    "close": "Đóng",
+    "account": "Tài khoản",
+    "login": "Đăng nhập"
+  },
+  "footer": {
+    "productsTitle": "Sản phẩm",
+    "banPhim": "Bàn phím cơ",
+    "chuot": "Chuột gaming",
+    "taiNghe": "Tai nghe",
+    "lotChuot": "Lót chuột",
+    "tayCam": "Tay cầm",
+    "companyTitle": "Công ty",
+    "supportTitle": "Hỗ trợ",
+    "tagline": "Phụ kiện gaming cao cấp — chế tác cho những game thủ không khoan nhượng. Chính xác. Bền bỉ. Đẳng cấp.",
+    "designedBy": "Thiết kế web:"
+  },
+  "hero": {
+    "scrollHint": "Cuộn xuống"
+  },
+  "testimonials": {
+    "heading": "Game thủ nói gì",
+    "ratingSummary": "4.9/5 · 3.200+ đánh giá"
+  },
+  "newsletter": {
+    "subscribed": "Cảm ơn bạn đã đăng ký!",
+    "placeholder": "Email của bạn",
+    "submit": "Đăng ký",
+    "submitting": "Đang gửi...",
+    "error": "Có lỗi xảy ra, vui lòng thử lại."
+  },
+  "aboutValues": {
+    "eyebrow": "Giá trị cốt lõi",
+    "headingLine1": "Những điều",
+    "headingLine2": "chúng tôi theo đuổi"
+  },
+  "aboutTeam": {
+    "eyebrow": "Đội ngũ",
+    "heading": "Những người đứng sau VERITY GEAR"
+  }
+}

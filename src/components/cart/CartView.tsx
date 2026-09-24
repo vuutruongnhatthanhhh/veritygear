@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useCart } from "@/components/providers/CartProvider";
 import { formatVnd } from "@/data/products";
 
