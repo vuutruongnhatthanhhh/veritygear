@@ -8,6 +8,7 @@ import SocialLinks from "./SocialLinks";
 import SearchOverlay from "./SearchOverlay";
 import { useCart } from "./providers/CartProvider";
 import { createClient } from "@/lib/supabase/client";
+import { toSocialLinks, FALLBACK_SOCIAL_LINKS, type SocialLink } from "@/lib/socialLinks";
 
 // Nav hrefs stay the literal Vietnamese slugs in both locales (agreed SEO
 // strategy) — only the visible label is translated, via the `nav` messages
@@ -46,6 +47,7 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [socialLinks, setSocialLinks] = useState<SocialLink[]>(FALLBACK_SOCIAL_LINKS);
 
   useEffect(() => {
     const supabase = createClient();
@@ -53,6 +55,12 @@ export default function Header() {
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       setLoggedIn(!!session?.user);
     });
+    supabase
+      .from("site_social_links")
+      .select("*")
+      .eq("id", 1)
+      .single()
+      .then(({ data }) => setSocialLinks(toSocialLinks(data)));
     return () => sub.subscription.unsubscribe();
   }, []);
 
@@ -116,7 +124,7 @@ export default function Header() {
               key={link.href}
               href={link.href}
               className={`text-[13px] font-medium uppercase tracking-[0.12em] transition-colors duration-500 ${
-                solid ? "text-ink/70 hover:text-ink" : "text-paper/80 hover:text-paper"
+                solid ? "text-ink hover:text-ink/70" : "text-paper/80 hover:text-paper"
               }`}
             >
               {t(link.key)}
@@ -127,7 +135,7 @@ export default function Header() {
         <div className="flex shrink-0 items-center gap-3 sm:gap-5">
           <div
             className={`hidden items-center gap-1.5 text-[12px] font-semibold tracking-[0.06em] transition-colors duration-500 sm:flex ${
-              solid ? "text-ink/70" : "text-paper/80"
+              solid ? "text-ink" : "text-paper/80"
             }`}
           >
             <button
@@ -156,7 +164,7 @@ export default function Header() {
             aria-label={t("search")}
             onClick={() => setSearchOpen(true)}
             className={`transition-colors duration-500 ${
-              solid ? "text-ink/70 hover:text-ink" : "text-paper/80 hover:text-paper"
+              solid ? "text-ink hover:text-ink/70" : "text-paper/80 hover:text-paper"
             }`}
           >
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
@@ -168,7 +176,7 @@ export default function Header() {
             href={loggedIn ? "/tai-khoan" : "/dang-nhap"}
             aria-label={loggedIn ? t("account") : t("login")}
             className={`transition-colors duration-500 ${
-              solid ? "text-ink/70 hover:text-ink" : "text-paper/80 hover:text-paper"
+              solid ? "text-ink hover:text-ink/70" : "text-paper/80 hover:text-paper"
             }`}
           >
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
@@ -180,7 +188,7 @@ export default function Header() {
             href="/gio-hang"
             aria-label={t("cart")}
             className={`relative transition-colors duration-500 ${
-              solid ? "text-ink/70 hover:text-ink" : "text-paper/80 hover:text-paper"
+              solid ? "text-ink hover:text-ink/70" : "text-paper/80 hover:text-paper"
             }`}
           >
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
@@ -274,7 +282,7 @@ export default function Header() {
             English
           </button>
         </div>
-        <SocialLinks variant="light" />
+        <SocialLinks links={socialLinks} variant="light" />
       </div>
     </nav>
 

@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
-import type { Article } from "@/data/news";
-import { formatArticleDate } from "@/data/news";
+import type { Article } from "@/lib/types";
 
 export default function NewsCard({ article }: { article: Article }) {
   return (
@@ -19,13 +18,13 @@ export default function NewsCard({ article }: { article: Article }) {
         </span>
       </div>
       <div className="mt-4">
-        <p className="text-[11px] uppercase tracking-[0.12em] text-ink/40">
-          {formatArticleDate(article.date)} · {article.readTime}
+        <p className="text-[11px] uppercase tracking-[0.12em] text-ink">
+          {article.date} · {article.readTime}
         </p>
         <h3 className="mt-2 font-display text-lg font-bold uppercase leading-snug tracking-wide transition-colors group-hover:text-ink/70">
           {article.title}
         </h3>
-        <p className="mt-2 text-[14px] leading-relaxed text-ink/55">
+        <p className="mt-2 text-[14px] leading-relaxed text-ink">
           {article.excerpt}
         </p>
         <span className="mt-3 inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.12em] text-ink">

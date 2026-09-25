@@ -19,14 +19,8 @@
   },
   "footer": {
     "productsTitle": "Sản phẩm",
-    "banPhim": "Bàn phím cơ",
-    "chuot": "Chuột gaming",
-    "taiNghe": "Tai nghe",
-    "lotChuot": "Lót chuột",
-    "tayCam": "Tay cầm",
     "companyTitle": "Công ty",
     "supportTitle": "Hỗ trợ",
-    "tagline": "Phụ kiện gaming cao cấp — chế tác cho những game thủ không khoan nhượng. Chính xác. Bền bỉ. Đẳng cấp.",
     "designedBy": "Thiết kế web:"
   },
   "hero": {
@@ -51,5 +45,54 @@
   "aboutTeam": {
     "eyebrow": "Đội ngũ",
     "heading": "Những người đứng sau VERITY GEAR"
+  },
+  "milestonesTimeline": {
+    "eyebrow": "Hành trình",
+    "headingLine1": "Các cột mốc",
+    "headingLine2": "đáng nhớ"
+  },
+  "shop": {
+    "all": "Tất cả",
+    "count": "Hiển thị {count} sản phẩm",
+    "empty": "Chưa có sản phẩm trong danh mục này."
+  },
+  "news": {
+    "all": "Tất cả",
+    "readTime": "{count} phút đọc",
+    "empty": "Chưa có bài viết trong chủ đề này."
+  },
+  "categoryGrid": {
+    "productCount": "{count} sản phẩm"
+  },
+  "productCard": {
+    "add": "Thêm vào giỏ",
+    "added": "Đã thêm vào giỏ ✓",
+    "decreaseQty": "Giảm số lượng",
+    "increaseQty": "Tăng số lượng"
+  },
+  "contactMap": {
+    "followUs": "Theo dõi chúng tôi"
+  },
+  "contactFaq": {
+    "eyebrow": "Giải đáp nhanh",
+    "heading": "Câu hỏi thường gặp"
+  },
+  "contactForm": {
+    "eyebrow": "Gửi tin nhắn",
+    "heading": "Chúng tôi lắng nghe bạn",
+    "description": "Điền thông tin bên dưới, đội ngũ của chúng tôi sẽ phản hồi trong vòng 24 giờ làm việc.",
+    "nameLabel": "Họ và tên",
+    "emailLabel": "Email",
+    "phoneLabel": "Điện thoại",
+    "subjectLabel": "Chủ đề",
+    "subjectPlaceholder": "Bạn cần hỗ trợ về vấn đề gì?",
+    "messageLabel": "Nội dung",
+    "messagePlaceholder": "Nhập nội dung tin nhắn của bạn...",
+    "submit": "Gửi tin nhắn",
+    "submitting": "Đang gửi...",
+    "sentTitle": "Đã gửi tin nhắn!",
+    "sentBody": "Cảm ơn bạn đã liên hệ. VERITY GEAR sẽ phản hồi qua email trong thời gian sớm nhất.",
+    "sendAnother": "Gửi tin nhắn khác",
+    "error": "Có lỗi xảy ra, vui lòng thử lại."
   }
 }

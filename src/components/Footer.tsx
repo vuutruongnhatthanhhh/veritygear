@@ -1,21 +1,30 @@
 import Image from "next/image";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import SocialLinks from "./SocialLinks";
+import { createClient } from "@/lib/supabase/server";
+import { toSocialLinks } from "@/lib/socialLinks";
 
 export default async function Footer() {
   const t = await getTranslations();
+  const locale = await getLocale();
+  const pick = (vi: string, en: string) => (locale === "en" ? en || vi : vi);
+  const supabase = await createClient();
+  const [{ data: socialRow }, { data: categoryRows }, { data: footerRow }] = await Promise.all([
+    supabase.from("site_social_links").select("*").eq("id", 1).single(),
+    supabase.from("product_categories").select("slug, name_vi, name_en").order("sort_order"),
+    supabase.from("site_footer").select("*").eq("id", 1).single(),
+  ]);
+  const socialLinks = toSocialLinks(socialRow);
+  const tagline = footerRow ? pick(footerRow.tagline_vi, footerRow.tagline_en) : "";
 
   const columns = [
     {
       title: t("footer.productsTitle"),
-      links: [
-        { label: t("footer.banPhim"), href: "/san-pham?danh-muc=ban-phim" },
-        { label: t("footer.chuot"), href: "/san-pham?danh-muc=chuot" },
-        { label: t("footer.taiNghe"), href: "/san-pham?danh-muc=tai-nghe" },
-        { label: t("footer.lotChuot"), href: "/san-pham?danh-muc=lot-chuot" },
-        { label: t("footer.tayCam"), href: "/san-pham?danh-muc=tay-cam" },
-      ],
+      links: (categoryRows ?? []).map((c) => ({
+        label: pick(c.name_vi, c.name_en),
+        href: `/san-pham?danh-muc=${c.slug}`,
+      })),
     },
     {
       title: t("footer.companyTitle"),
@@ -43,8 +52,8 @@ export default async function Footer() {
               height={100}
               className="h-20 w-47 object-contain object-left"
             />
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-paper/60">{t("footer.tagline")}</p>
-            <SocialLinks variant="dark" className="mt-6" />
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-paper/60">{tagline}</p>
+            <SocialLinks links={socialLinks} variant="dark" className="mt-6" />
           </div>
 
           {columns.map((col) => (

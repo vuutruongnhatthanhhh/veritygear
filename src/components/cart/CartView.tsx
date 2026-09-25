@@ -3,11 +3,9 @@
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { useCart } from "@/components/providers/CartProvider";
-import { formatVnd } from "@/data/products";
+import { formatVnd } from "@/lib/format";
 
-const FREE_SHIPPING_THRESHOLD = 1500000;
-
-export default function CartView() {
+export default function CartView({ freeShippingThreshold }: { freeShippingThreshold: number }) {
   const { items, subtotal, setQty, removeItem } = useCart();
 
   if (items.length === 0) {
@@ -33,7 +31,7 @@ export default function CartView() {
     );
   }
 
-  const remaining = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
+  const remaining = Math.max(0, freeShippingThreshold - subtotal);
 
   return (
     <>

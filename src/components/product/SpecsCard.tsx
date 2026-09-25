@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { Product } from "@/data/products";
+import type { Product } from "@/lib/types";
 
 export default function SpecsCard({ specs }: { specs: Product["specs"] }) {
   const [open, setOpen] = useState(true);
@@ -25,8 +25,8 @@ export default function SpecsCard({ specs }: { specs: Product["specs"] }) {
       {open && (
         <div className="mt-5 space-y-3">
           {specs.map((spec) => (
-            <p key={spec.label} className="text-[14px] leading-relaxed text-ink/60">
-              <span className="text-ink/80">{spec.label}:</span> {spec.value}
+            <p key={spec.label} className="text-[14px] leading-relaxed text-ink">
+              <span className="font-semibold text-ink">{spec.label}:</span> {spec.value}
             </p>
           ))}
         </div>

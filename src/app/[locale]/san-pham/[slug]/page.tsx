@@ -1,16 +1,19 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { products, formatVnd } from "@/data/products";
+import { createClient } from "@/lib/supabase/server";
+import { formatVnd } from "@/lib/format";
+import type { Product } from "@/lib/types";
 import ProductActions from "@/components/product/ProductActions";
 import SpecsCard from "@/components/product/SpecsCard";
 import RelatedProducts from "@/components/product/RelatedProducts";
 import Newsletter from "@/components/Newsletter";
 
-export function generateStaticParams() {
-  return products.map((p) => ({ slug: p.slug }));
-}
+// Products are managed live from the admin — no generateStaticParams here,
+// every request resolves the current catalog (same as every other
+// Supabase-backed page in this app).
 
 export async function generateMetadata({
   params,
@@ -18,12 +21,22 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const product = products.find((p) => p.slug === slug);
+  const locale = await getLocale();
+  const supabase = await createClient();
+  const { data: product } = await supabase
+    .from("products")
+    .select("name, tagline_vi, tagline_en")
+    .eq("slug", slug)
+    .eq("is_active", true)
+    .single();
+
   if (!product) return {};
+
+  const tagline = locale === "en" ? product.tagline_en || product.tagline_vi : product.tagline_vi;
 
   return {
     title: `${product.name} — VERITY GEAR`,
-    description: product.tagline,
+    description: tagline,
   };
 }
 
@@ -39,12 +52,62 @@ export default async function ProductDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = products.find((p) => p.slug === slug);
-  if (!product) notFound();
+  const locale = await getLocale();
+  const supabase = await createClient();
+  const pick = (vi: string, en: string) => (locale === "en" ? en || vi : vi);
 
-  const related = products.filter(
-    (p) => p.category === product.category && p.slug !== product.slug,
-  );
+  const { data: row } = await supabase
+    .from("products")
+    .select("*, product_categories(id, name_vi, name_en)")
+    .eq("slug", slug)
+    .eq("is_active", true)
+    .single();
+
+  if (!row) notFound();
+
+  const { data: specRows } = await supabase
+    .from("product_specs")
+    .select("*")
+    .eq("product_id", row.id)
+    .order("sort_order");
+
+  const product: Product = {
+    slug: row.slug,
+    name: row.name,
+    category: row.product_categories ? pick(row.product_categories.name_vi, row.product_categories.name_en) : "",
+    tagline: pick(row.tagline_vi, row.tagline_en),
+    price: row.price,
+    compareAtPrice: row.compare_at_price ?? undefined,
+    image: row.image_url ?? "",
+    badge: pick(row.badge_vi ?? "", row.badge_en ?? "") || undefined,
+    description: pick(row.description_vi, row.description_en),
+    specs: (specRows ?? []).map((s) => ({ label: pick(s.label_vi, s.label_en), value: pick(s.value_vi, s.value_en) })),
+  };
+
+  let related: Product[] = [];
+  if (row.category_id) {
+    const { data: relatedRows } = await supabase
+      .from("products")
+      .select("*, product_categories(name_vi, name_en)")
+      .eq("category_id", row.category_id)
+      .eq("is_active", true)
+      .neq("id", row.id)
+      .order("sort_order")
+      .limit(4);
+
+    related = (relatedRows ?? []).map((p) => ({
+      slug: p.slug,
+      name: p.name,
+      category: p.product_categories ? pick(p.product_categories.name_vi, p.product_categories.name_en) : "",
+      tagline: pick(p.tagline_vi, p.tagline_en),
+      price: p.price,
+      compareAtPrice: p.compare_at_price ?? undefined,
+      image: p.image_url ?? "",
+      badge: pick(p.badge_vi ?? "", p.badge_en ?? "") || undefined,
+      description: pick(p.description_vi, p.description_en),
+      specs: [],
+    }));
+  }
 
   return (
     <>
@@ -81,13 +144,13 @@ export default async function ProductDetailPage({
           </div>
 
           <div>
-            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink/40">
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink">
               {product.category}
             </p>
             <h1 className="font-display text-3xl font-bold uppercase leading-[1.05] sm:text-4xl">
               {product.name}
             </h1>
-            <p className="mt-3 max-w-md text-[15px] leading-relaxed text-ink/60">
+            <p className="mt-3 max-w-md text-[15px] leading-relaxed text-ink">
               {product.tagline}
             </p>
 
@@ -102,7 +165,7 @@ export default async function ProductDetailPage({
               )}
             </div>
 
-            <p className="mt-6 max-w-lg text-[15px] leading-relaxed text-ink/65">
+            <p className="mt-6 max-w-lg text-[15px] leading-relaxed text-ink">
               {product.description}
             </p>
 
@@ -116,7 +179,7 @@ export default async function ProductDetailPage({
                   <p className="text-[13px] font-semibold uppercase tracking-[0.08em]">
                     {f.label}
                   </p>
-                  <p className="mt-1 text-[13px] text-ink/50">{f.desc}</p>
+                  <p className="mt-1 text-[13px] text-ink">{f.desc}</p>
                 </div>
               ))}
             </div>

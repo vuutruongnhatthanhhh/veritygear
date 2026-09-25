@@ -1,5 +1,6 @@
 import { getLocale } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
+import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AccountForm } from "./account-form";
 
@@ -33,6 +34,13 @@ export default async function TaiKhoanPage() {
       </h1>
 
       <AccountForm email={user.email ?? ""} profile={profile} />
+
+      <Link
+        href="/tai-khoan/don-hang"
+        className="mt-6 flex h-13 w-full items-center justify-center border border-ink/15 text-[13px] font-semibold uppercase tracking-[0.14em] text-ink/70 transition-colors hover:border-ink hover:text-ink"
+      >
+        Đơn hàng của tôi
+      </Link>
     </section>
   );
 }

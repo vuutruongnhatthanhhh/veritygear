@@ -1,32 +1,28 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useActionState, useEffect } from "react";
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { useCart } from "@/components/providers/CartProvider";
-import { formatVnd } from "@/data/products";
+import { formatVnd } from "@/lib/format";
+import { placeOrder } from "@/app/[locale]/thanh-toan/actions";
 
-const FREE_SHIPPING_THRESHOLD = 1500000;
-const SHIPPING_FEE = 35000;
+type Prefill = { fullName: string; phone: string; address: string; email: string };
+type ShippingConfig = { freeShippingThreshold: number; shippingFee: number };
 
-type PaymentMethod = "cod" | "transfer";
-
-export default function CheckoutView() {
+export default function CheckoutView({ prefill, shipping }: { prefill: Prefill; shipping: ShippingConfig }) {
   const { items, subtotal, clear } = useCart();
-  const [payment, setPayment] = useState<PaymentMethod>("cod");
-  const [orderCode, setOrderCode] = useState<string | null>(null);
+  const [state, action, pending] = useActionState(placeOrder, null);
 
-  const shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
-  const total = subtotal + shipping;
+  const shippingCost = subtotal >= shipping.freeShippingThreshold ? 0 : shipping.shippingFee;
+  const total = subtotal + shippingCost;
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const code = `VG${Date.now().toString().slice(-8)}`;
-    setOrderCode(code);
-    clear();
-  }
+  useEffect(() => {
+    if (state?.orderCode) clear();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state?.orderCode]);
 
-  if (orderCode) {
+  if (state?.orderCode) {
     return (
       <div className="mx-auto flex max-w-[1600px] flex-col items-center px-6 py-32 text-center sm:px-10">
         <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.35em] text-ink/40">
@@ -37,15 +33,23 @@ export default function CheckoutView() {
         </h1>
         <p className="mt-4 max-w-md text-[15px] leading-relaxed text-ink/60">
           Mã đơn hàng của bạn là{" "}
-          <span className="font-semibold text-ink">{orderCode}</span>. Đội
+          <span className="font-semibold text-ink">{state.orderCode}</span>. Đội
           ngũ VERITY GEAR sẽ liên hệ xác nhận trong vòng 24 giờ.
         </p>
-        <Link
-          href="/"
-          className="mt-8 inline-flex h-13 items-center bg-ink px-8 text-[13px] font-semibold uppercase tracking-[0.14em] text-paper transition-transform hover:scale-[1.02]"
-        >
-          Về trang chủ
-        </Link>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+          <Link
+            href={`/tai-khoan/don-hang/${state.orderCode}`}
+            className="inline-flex h-13 items-center bg-ink px-8 text-[13px] font-semibold uppercase tracking-[0.14em] text-paper transition-transform hover:scale-[1.02]"
+          >
+            Xem đơn hàng
+          </Link>
+          <Link
+            href="/"
+            className="inline-flex h-13 items-center border border-ink/20 px-8 text-[13px] font-semibold uppercase tracking-[0.14em] text-ink transition-colors hover:border-ink"
+          >
+            Về trang chủ
+          </Link>
+        </div>
       </div>
     );
   }
@@ -93,10 +97,13 @@ export default function CheckoutView() {
           Thanh toán
         </h1>
 
-        <form
-          onSubmit={handleSubmit}
-          className="mt-10 grid grid-cols-1 gap-12 lg:grid-cols-3 lg:gap-16"
-        >
+        {state?.error && (
+          <div className="mt-6 border border-red-300 bg-red-50 px-5 py-4 text-sm text-red-700">{state.error}</div>
+        )}
+
+        <form action={action} className="mt-10 grid grid-cols-1 gap-12 lg:grid-cols-3 lg:gap-16">
+          <input type="hidden" name="items_json" value={JSON.stringify(items)} readOnly />
+
           <div className="flex flex-col gap-10 lg:col-span-2">
             <div>
               <h2 className="text-[13px] font-semibold uppercase tracking-[0.14em]">
@@ -106,6 +113,7 @@ export default function CheckoutView() {
                 <input
                   required
                   name="fullName"
+                  defaultValue={prefill.fullName}
                   placeholder="Họ và tên"
                   className="h-13 w-full border border-ink/25 bg-transparent px-5 text-sm placeholder:text-ink/40 focus:border-ink focus:outline-none sm:col-span-2"
                 />
@@ -113,6 +121,7 @@ export default function CheckoutView() {
                   required
                   type="tel"
                   name="phone"
+                  defaultValue={prefill.phone}
                   placeholder="Số điện thoại"
                   className="h-13 w-full border border-ink/25 bg-transparent px-5 text-sm placeholder:text-ink/40 focus:border-ink focus:outline-none"
                 />
@@ -120,12 +129,14 @@ export default function CheckoutView() {
                   required
                   type="email"
                   name="email"
+                  defaultValue={prefill.email}
                   placeholder="Email"
                   className="h-13 w-full border border-ink/25 bg-transparent px-5 text-sm placeholder:text-ink/40 focus:border-ink focus:outline-none"
                 />
                 <input
                   required
                   name="address"
+                  defaultValue={prefill.address}
                   placeholder="Địa chỉ"
                   className="h-13 w-full border border-ink/25 bg-transparent px-5 text-sm placeholder:text-ink/40 focus:border-ink focus:outline-none sm:col-span-2"
                 />
@@ -149,38 +160,23 @@ export default function CheckoutView() {
                 Phương thức thanh toán
               </h2>
               <div className="mt-5 flex flex-col gap-3">
-                <label
-                  className={`flex cursor-pointer items-center gap-3 border px-5 py-4 transition-colors ${
-                    payment === "cod" ? "border-ink" : "border-ink/20"
-                  }`}
-                >
+                <label className="flex cursor-pointer items-center gap-3 border border-ink px-5 py-4 transition-colors">
                   <input
                     type="radio"
                     name="payment"
                     value="cod"
-                    checked={payment === "cod"}
-                    onChange={() => setPayment("cod")}
+                    defaultChecked
                     className="h-4 w-4 accent-ink"
                   />
                   <span className="text-sm font-medium">
                     Thanh toán khi nhận hàng (COD)
                   </span>
                 </label>
-                <label
-                  className={`flex cursor-pointer items-center gap-3 border px-5 py-4 transition-colors ${
-                    payment === "transfer" ? "border-ink" : "border-ink/20"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="payment"
-                    value="transfer"
-                    checked={payment === "transfer"}
-                    onChange={() => setPayment("transfer")}
-                    className="h-4 w-4 accent-ink"
-                  />
-                  <span className="text-sm font-medium">
-                    Chuyển khoản ngân hàng
+                <label className="flex cursor-not-allowed items-center gap-3 border border-ink/20 px-5 py-4 text-ink/40 transition-colors">
+                  <input type="radio" name="payment" value="transfer" disabled className="h-4 w-4 accent-ink" />
+                  <span className="text-sm font-medium">Chuyển khoản ngân hàng</span>
+                  <span className="ml-auto shrink-0 rounded-full border border-ink/20 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em]">
+                    Sắp ra mắt
                   </span>
                 </label>
               </div>
@@ -227,7 +223,7 @@ export default function CheckoutView() {
               <div className="flex items-center justify-between">
                 <span className="text-ink/60">Vận chuyển</span>
                 <span className="font-semibold">
-                  {shipping === 0 ? "Miễn phí" : formatVnd(shipping)}
+                  {shippingCost === 0 ? "Miễn phí" : formatVnd(shippingCost)}
                 </span>
               </div>
             </div>
@@ -241,9 +237,10 @@ export default function CheckoutView() {
 
             <button
               type="submit"
-              className="mt-6 h-13 w-full bg-ink px-8 text-[13px] font-semibold uppercase tracking-[0.14em] text-paper transition-transform hover:scale-[1.02]"
+              disabled={pending}
+              className="mt-6 h-13 w-full bg-ink px-8 text-[13px] font-semibold uppercase tracking-[0.14em] text-paper transition-transform hover:scale-[1.02] disabled:opacity-60"
             >
-              Đặt hàng
+              {pending ? "Đang xử lý..." : "Đặt hàng"}
             </button>
           </div>
         </form>

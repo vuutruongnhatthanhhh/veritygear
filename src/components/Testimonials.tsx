@@ -48,32 +48,32 @@ export default async function Testimonials() {
         <h2 className="max-w-lg font-display text-4xl font-bold uppercase leading-[1.05] sm:text-5xl">
           {t("heading")}
         </h2>
-        <div className="hidden items-center gap-1 text-ink/80 sm:flex">
+        <div className="hidden items-center gap-1 text-ink sm:flex">
           {Array.from({ length: 5 }).map((_, i) => (
             <svg key={i} width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
               <path d="m12 2 3.1 6.7 7.4.8-5.5 5 1.6 7.3L12 18l-6.6 3.8L7 14.5l-5.5-5 7.4-.8Z" />
             </svg>
           ))}
-          <span className="ml-2 text-sm font-medium text-ink/60">{t("ratingSummary")}</span>
+          <span className="ml-2 text-sm font-medium text-ink">{t("ratingSummary")}</span>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-8 border-t border-ink/10 pt-12 md:grid-cols-3">
         {items.map((r, i) => (
           <figure key={i} className="flex flex-col">
-            <div className="mb-4 flex gap-1 text-ink/80">
+            <div className="mb-4 flex gap-1 text-ink">
               {Array.from({ length: r.rating ?? 5 }).map((_, j) => (
                 <svg key={j} width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                   <path d="m12 2 3.1 6.7 7.4.8-5.5 5 1.6 7.3L12 18l-6.6 3.8L7 14.5l-5.5-5 7.4-.8Z" />
                 </svg>
               ))}
             </div>
-            <blockquote className="flex-1 text-[15px] leading-relaxed text-ink/75">
+            <blockquote className="flex-1 text-[15px] leading-relaxed text-ink">
               “{pick(r.quote_vi, r.quote_en)}”
             </blockquote>
             <figcaption className="mt-6 text-sm">
               <span className="font-semibold">{r.name}</span>
-              <span className="text-ink/40"> — {pick(r.role_vi, r.role_en)}</span>
+              <span className="text-ink"> — {pick(r.role_vi, r.role_en)}</span>
             </figcaption>
           </figure>
         ))}

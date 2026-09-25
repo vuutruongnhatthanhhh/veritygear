@@ -1,16 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import type { Product } from "@/data/products";
+import { useTranslations } from "next-intl";
+import type { Product } from "@/lib/types";
 import { useCart } from "@/components/providers/CartProvider";
 
 export default function ProductActions({ product }: { product: Product }) {
+  const t = useTranslations("productCard");
   const { addItem } = useCart();
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
 
   function handleAdd() {
-    addItem(product.slug, qty);
+    addItem({ slug: product.slug, name: product.name, image: product.image, price: product.price }, qty);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   }
@@ -21,7 +23,7 @@ export default function ProductActions({ product }: { product: Product }) {
         <button
           type="button"
           onClick={() => setQty((q) => Math.max(1, q - 1))}
-          aria-label="Giảm số lượng"
+          aria-label={t("decreaseQty")}
           className="flex h-full w-11 items-center justify-center text-ink/60 transition-colors hover:text-ink"
         >
           −
@@ -32,7 +34,7 @@ export default function ProductActions({ product }: { product: Product }) {
         <button
           type="button"
           onClick={() => setQty((q) => q + 1)}
-          aria-label="Tăng số lượng"
+          aria-label={t("increaseQty")}
           className="flex h-full w-11 items-center justify-center text-ink/60 transition-colors hover:text-ink"
         >
           +
@@ -44,7 +46,7 @@ export default function ProductActions({ product }: { product: Product }) {
         onClick={handleAdd}
         className="h-13 flex-1 min-w-[180px] bg-ink px-8 text-[13px] font-semibold uppercase tracking-[0.14em] text-paper transition-transform hover:scale-[1.02]"
       >
-        {added ? "Đã thêm vào giỏ ✓" : "Thêm vào giỏ"}
+        {added ? t("added") : t("add")}
       </button>
     </div>
   );

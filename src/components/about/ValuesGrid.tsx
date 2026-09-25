@@ -73,7 +73,7 @@ export default async function ValuesGrid() {
       <div className="grid grid-cols-1 gap-10 border-t border-ink/10 pt-12 sm:grid-cols-2 lg:grid-cols-4">
         {values.map((v, i) => (
           <div key={i} className="flex flex-col gap-4">
-            <span className="flex h-12 w-12 items-center justify-center rounded-full border border-ink/15">
+            <span className="flex h-12 w-12 items-center justify-center rounded-full border border-ink">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 {ICONS[v.icon_key] ?? ICONS.precision}
               </svg>

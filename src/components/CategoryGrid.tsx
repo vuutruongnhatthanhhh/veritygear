@@ -1,25 +1,54 @@
 import Image from "next/image";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { categories } from "@/data/products";
+import { createClient } from "@/lib/supabase/server";
+import type { Category } from "@/lib/types";
 
-export default function CategoryGrid() {
+export default async function CategoryGrid() {
+  const locale = await getLocale();
+  const t = await getTranslations("categoryGrid");
+  const supabase = await createClient();
+  const [{ data: content }, { data: categoryRows }, { data: productRows }] = await Promise.all([
+    supabase.from("home_category_grid").select("*").eq("id", 1).single(),
+    supabase.from("product_categories").select("*").eq("show_on_homepage", true).order("sort_order"),
+    supabase.from("products").select("category_id").eq("is_active", true),
+  ]);
+
+  const countByCategory = new Map<number, number>();
+  (productRows ?? []).forEach((p) => {
+    if (p.category_id) countByCategory.set(p.category_id, (countByCategory.get(p.category_id) ?? 0) + 1);
+  });
+
+  const pick = (vi: string, en: string) => (locale === "en" ? en || vi : vi);
+
+  const categories: Category[] = (categoryRows ?? []).map((c) => ({
+    slug: c.slug,
+    name: pick(c.name_vi, c.name_en),
+    image: c.image_url ?? "",
+    count: countByCategory.get(c.id) ?? 0,
+  }));
+
+  if (categories.length === 0) return null;
+
+  const eyebrow = content ? pick(content.eyebrow_vi, content.eyebrow_en) : "";
+  const headingLine1 = content ? pick(content.heading_line1_vi, content.heading_line1_en) : "";
+  const headingLine2 = content ? pick(content.heading_line2_vi, content.heading_line2_en) : "";
+  const description = content ? pick(content.description_vi, content.description_en) : "";
+
   return (
     <section id="danh-muc" className="mx-auto max-w-[1600px] px-6 py-24 sm:px-10 sm:py-32">
       <div className="mb-14 flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
         <div>
           <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.35em] text-ink">
-            Danh mục
+            {eyebrow}
           </p>
           <h2 className="max-w-lg font-display text-4xl font-bold uppercase leading-[1.05] sm:text-5xl">
-            Chọn vũ khí
+            {headingLine1}
             <br />
-            của bạn
+            {headingLine2}
           </h2>
         </div>
-        <p className="max-w-sm text-sm leading-relaxed text-ink">
-          Từ bàn phím cơ đến tai nghe âm trường vòm — mỗi sản phẩm đều được
-          kiểm định qua hàng nghìn giờ thi đấu thực tế.
-        </p>
+        <p className="max-w-sm text-sm leading-relaxed text-ink">{description}</p>
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4 md:grid-rows-2">
@@ -46,7 +75,7 @@ export default function CategoryGrid() {
                 <h3 className="font-display text-lg font-bold uppercase tracking-wide text-paper">
                   {cat.name}
                 </h3>
-                <p className="mt-1 text-xs text-paper/60">{cat.count} sản phẩm</p>
+                <p className="mt-1 text-xs text-paper/60">{t("productCount", { count: cat.count })}</p>
               </div>
               <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-paper/40 text-paper transition-transform duration-500 group-hover:rotate-45">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

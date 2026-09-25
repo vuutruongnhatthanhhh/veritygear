@@ -3,17 +3,19 @@
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { useState } from "react";
-import type { Product } from "@/data/products";
-import { formatVnd } from "@/data/products";
+import { useTranslations } from "next-intl";
+import type { Product } from "@/lib/types";
+import { formatVnd } from "@/lib/format";
 import { useCart } from "@/components/providers/CartProvider";
 
 export default function ProductCard({ product }: { product: Product }) {
+  const t = useTranslations("productCard");
   const href = `/san-pham/${product.slug}`;
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);
 
   function handleAdd() {
-    addItem(product.slug, 1);
+    addItem({ slug: product.slug, name: product.name, image: product.image, price: product.price }, 1);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   }
@@ -42,7 +44,7 @@ export default function ProductCard({ product }: { product: Product }) {
             added ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
           }`}
         >
-          {added ? "Đã thêm vào giỏ ✓" : "Thêm vào giỏ"}
+          {added ? t("added") : t("add")}
         </button>
       </div>
       <Link href={href} className="mt-4 flex items-start justify-between gap-2">

@@ -2,8 +2,22 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
+import { useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { products, formatVnd } from "@/data/products";
+import { createClient } from "@/lib/supabase/client";
+import { formatVnd } from "@/lib/format";
+
+type SearchProduct = { slug: string; name: string; category: string; tagline: string; price: number; image: string };
+
+type CatalogRow = {
+  slug: string;
+  name: string;
+  tagline_vi: string;
+  tagline_en: string;
+  price: number;
+  image_url: string | null;
+  product_categories: { name_vi: string; name_en: string } | null;
+};
 
 export default function SearchOverlay({
   open,
@@ -12,7 +26,10 @@ export default function SearchOverlay({
   open: boolean;
   onClose: () => void;
 }) {
+  const locale = useLocale();
   const [query, setQuery] = useState("");
+  const [catalog, setCatalog] = useState<SearchProduct[]>([]);
+  const [loaded, setLoaded] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -25,6 +42,33 @@ export default function SearchOverlay({
       setQuery("");
     }
   }, [open]);
+
+  // Fetch the active catalog once, the first time the overlay is opened —
+  // there's no synchronous local array to search anymore, but the dataset
+  // is small enough to load in full and filter client-side like before.
+  useEffect(() => {
+    if (!open || loaded) return;
+    const supabase = createClient();
+    supabase
+      .from("products")
+      .select("slug, name, tagline_vi, tagline_en, price, image_url, category_id, product_categories(name_vi, name_en)")
+      .eq("is_active", true)
+      .returns<CatalogRow[]>()
+      .then(({ data }) => {
+        const pick = (vi: string, en: string) => (locale === "en" ? en || vi : vi);
+        setCatalog(
+          (data ?? []).map((p) => ({
+            slug: p.slug,
+            name: p.name,
+            category: p.product_categories ? pick(p.product_categories.name_vi, p.product_categories.name_en) : "",
+            tagline: pick(p.tagline_vi, p.tagline_en),
+            price: p.price,
+            image: p.image_url ?? "",
+          })),
+        );
+        setLoaded(true);
+      });
+  }, [open, loaded, locale]);
 
   useEffect(() => {
     if (!open) return;
@@ -42,7 +86,7 @@ export default function SearchOverlay({
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return [];
-    return products
+    return catalog
       .filter(
         (p) =>
           p.name.toLowerCase().includes(q) ||
@@ -50,7 +94,7 @@ export default function SearchOverlay({
           p.tagline.toLowerCase().includes(q),
       )
       .slice(0, 6);
-  }, [query]);
+  }, [query, catalog]);
 
   return (
     <div

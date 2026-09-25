@@ -19,14 +19,8 @@
   },
   "footer": {
     "productsTitle": "Products",
-    "banPhim": "Mechanical keyboards",
-    "chuot": "Gaming mice",
-    "taiNghe": "Headsets",
-    "lotChuot": "Mousepads",
-    "tayCam": "Controllers",
     "companyTitle": "Company",
     "supportTitle": "Support",
-    "tagline": "Premium gaming gear — crafted for gamers who refuse to compromise. Precise. Durable. Elite.",
     "designedBy": "Web design:"
   },
   "hero": {
@@ -51,5 +45,54 @@
   "aboutTeam": {
     "eyebrow": "Team",
     "heading": "The people behind VERITY GEAR"
+  },
+  "milestonesTimeline": {
+    "eyebrow": "Our journey",
+    "headingLine1": "Milestones",
+    "headingLine2": "worth remembering"
+  },
+  "shop": {
+    "all": "All",
+    "count": "Showing {count} products",
+    "empty": "No products in this category yet."
+  },
+  "news": {
+    "all": "All",
+    "readTime": "{count} min read",
+    "empty": "No articles in this topic yet."
+  },
+  "categoryGrid": {
+    "productCount": "{count} products"
+  },
+  "productCard": {
+    "add": "Add to cart",
+    "added": "Added to cart ✓",
+    "decreaseQty": "Decrease quantity",
+    "increaseQty": "Increase quantity"
+  },
+  "contactMap": {
+    "followUs": "Follow us"
+  },
+  "contactFaq": {
+    "eyebrow": "Quick answers",
+    "heading": "Frequently asked questions"
+  },
+  "contactForm": {
+    "eyebrow": "Send a message",
+    "heading": "We're listening",
+    "description": "Fill in the details below and our team will get back to you within 24 business hours.",
+    "nameLabel": "Full name",
+    "emailLabel": "Email",
+    "phoneLabel": "Phone",
+    "subjectLabel": "Subject",
+    "subjectPlaceholder": "What do you need help with?",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Type your message...",
+    "submit": "Send message",
+    "submitting": "Sending...",
+    "sentTitle": "Message sent!",
+    "sentBody": "Thanks for reaching out. VERITY GEAR will get back to you by email soon.",
+    "sendAnother": "Send another message",
+    "error": "Something went wrong, please try again."
   }
 }

@@ -1,13 +1,30 @@
 import Image from "next/image";
+import { getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { products } from "@/data/products";
+import { createClient } from "@/lib/supabase/server";
 
-const LINEUP_SLUGS = ["vertex-x1", "phantom-pro", "aero-one", "pulse"];
+type LineupRow = {
+  slug: string;
+  name: string;
+  image_url: string | null;
+  product_categories: { name_vi: string; name_en: string } | null;
+};
 
-export default function ProductLineup() {
-  const lineup = LINEUP_SLUGS.map((slug) =>
-    products.find((p) => p.slug === slug),
-  ).filter((p): p is NonNullable<typeof p> => Boolean(p));
+export default async function ProductLineup() {
+  const locale = await getLocale();
+  const supabase = await createClient();
+  const { data: lineup } = await supabase
+    .from("products")
+    .select("slug, name, image_url, category_id, product_categories(name_vi, name_en)")
+    .eq("is_active", true)
+    .eq("is_lineup", true)
+    .order("sort_order")
+    .limit(4)
+    .returns<LineupRow[]>();
+
+  const pick = (vi: string, en: string) => (locale === "en" ? en || vi : vi);
+
+  if (!lineup || lineup.length === 0) return null;
 
   return (
     <section className="mx-auto max-w-[1600px] px-6 py-24 sm:px-10 sm:py-32">
@@ -29,7 +46,7 @@ export default function ProductLineup() {
           >
             <div className="relative aspect-3/4 w-full">
               <Image
-                src={product.image}
+                src={product.image_url ?? ""}
                 alt={product.name}
                 fill
                 sizes="(min-width: 1024px) 25vw, 50vw"
@@ -42,7 +59,7 @@ export default function ProductLineup() {
                   {product.name}
                 </h3>
                 <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-paper/60">
-                  {product.category}
+                  {product.product_categories ? pick(product.product_categories.name_vi, product.product_categories.name_en) : ""}
                 </p>
               </div>
             </div>
