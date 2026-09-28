@@ -1,12 +1,15 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 
 const inputClass =
   "w-full border border-ink/15 bg-ink/[0.03] px-4 py-3.5 text-[14px] text-ink placeholder:text-ink/35 outline-none transition-colors focus:border-ink";
 
 export default function QuenMatKhauPage() {
+  const t = useTranslations("auth.forgotPassword");
+  const tAccount = useTranslations("account");
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,12 +29,12 @@ export default function QuenMatKhauPage() {
         body: JSON.stringify({ email }),
       });
       if (!res.ok && res.status === 429) {
-        setError("Bạn đã thử quá nhiều lần, vui lòng thử lại sau.");
+        setError(t("errorRateLimited"));
       } else {
         setSent(true);
       }
     } catch {
-      setError("Có lỗi xảy ra, vui lòng thử lại.");
+      setError(t("errorServer"));
     } finally {
       setSubmitting(false);
     }
@@ -40,22 +43,17 @@ export default function QuenMatKhauPage() {
   return (
     <section className="mx-auto flex min-h-[75vh] max-w-md flex-col justify-center px-6 py-32">
       <p className="mb-4 text-center text-[11px] font-semibold uppercase tracking-[0.35em] text-ink">
-        Tài khoản
+        {tAccount("eyebrow")}
       </p>
       <h1 className="mb-3 text-center font-display text-3xl font-bold uppercase leading-tight sm:text-4xl">
-        Quên mật khẩu
+        {t("heading")}
       </h1>
-      <p className="mb-8 text-center text-[14px] text-ink/60">
-        Nhập email đã đăng ký, chúng tôi sẽ gửi liên kết đặt lại mật khẩu.
-      </p>
+      <p className="mb-8 text-center text-[14px] text-ink/60">{t("description")}</p>
 
       {sent ? (
         <div className="border border-ink/15 bg-ink/[0.03] p-8 text-center">
-          <p className="font-display text-lg font-bold uppercase">Đã gửi liên kết</p>
-          <p className="mt-2 text-[14px] text-ink/60">
-            Nếu email tồn tại trong hệ thống, một liên kết đặt lại mật khẩu đã được gửi. Vui lòng kiểm tra hộp thư
-            đến (và cả thư mục Spam).
-          </p>
+          <p className="font-display text-lg font-bold uppercase">{t("sentHeading")}</p>
+          <p className="mt-2 text-[14px] text-ink/60">{t("sentBody")}</p>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -64,7 +62,7 @@ export default function QuenMatKhauPage() {
           )}
           <div>
             <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.15em] text-ink/60">
-              Email
+              {t("emailLabel")}
             </label>
             <input required name="email" type="email" autoComplete="email" placeholder="ban@email.com" className={inputClass} />
           </div>
@@ -74,14 +72,14 @@ export default function QuenMatKhauPage() {
             disabled={submitting}
             className="inline-flex h-13 w-full items-center justify-center bg-ink text-[13px] font-semibold uppercase tracking-[0.14em] text-paper transition-transform hover:scale-[1.01] disabled:opacity-60"
           >
-            {submitting ? "Đang gửi..." : "Gửi liên kết đặt lại"}
+            {submitting ? t("submitting") : t("submit")}
           </button>
         </form>
       )}
 
       <p className="mt-6 text-center text-[13px]">
         <Link href="/dang-nhap" className="text-ink/60 underline underline-offset-4 hover:text-ink">
-          ← Quay lại đăng nhập
+          {t("backToLogin")}
         </Link>
       </p>
     </section>

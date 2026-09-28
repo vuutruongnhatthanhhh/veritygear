@@ -1,8 +1,13 @@
+"use client";
+
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { Article } from "@/lib/types";
 
 export default function NewsCard({ article }: { article: Article }) {
+  const t = useTranslations("news");
+
   return (
     <Link href={`/tin-tuc/${article.slug}`} className="group flex flex-col">
       <div className="relative aspect-[4/3] overflow-hidden bg-ink/5">
@@ -28,7 +33,7 @@ export default function NewsCard({ article }: { article: Article }) {
           {article.excerpt}
         </p>
         <span className="mt-3 inline-flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.12em] text-ink">
-          Đọc tiếp
+          {t("continueReading")}
           <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
         </span>
       </div>

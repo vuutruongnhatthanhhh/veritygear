@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import type { Product } from "@/lib/types";
 
 export default function SpecsCard({ specs }: { specs: Product["specs"] }) {
+  const t = useTranslations("productDetail");
   const [open, setOpen] = useState(true);
 
   return (
@@ -15,7 +17,7 @@ export default function SpecsCard({ specs }: { specs: Product["specs"] }) {
         aria-expanded={open}
       >
         <span className="font-display text-base font-bold">
-          Thông số kỹ thuật
+          {t("specsHeading")}
         </span>
         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-ink/20 text-lg leading-none text-ink transition-transform duration-300">
           {open ? "−" : "+"}

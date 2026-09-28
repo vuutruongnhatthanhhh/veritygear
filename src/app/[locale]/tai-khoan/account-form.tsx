@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { updateProfile } from "./actions";
@@ -11,6 +12,7 @@ const inputClass =
 type Profile = { full_name: string; phone: string; address: string } | null;
 
 export function AccountForm({ email, profile }: { email: string; profile: Profile }) {
+  const t = useTranslations("account");
   const [state, action, pending] = useActionState(updateProfile, null);
   const router = useRouter();
 
@@ -35,25 +37,25 @@ export function AccountForm({ email, profile }: { email: string; profile: Profil
       <form action={action} className="space-y-5">
         <div>
           <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.15em] text-ink/60">
-            Email
+            {t("emailLabel")}
           </label>
           <input disabled value={email} className={`${inputClass} cursor-not-allowed opacity-60`} />
         </div>
         <div>
           <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.15em] text-ink/60">
-            Họ và tên
+            {t("fullNameLabel")}
           </label>
           <input name="fullName" type="text" defaultValue={profile?.full_name ?? ""} className={inputClass} />
         </div>
         <div>
           <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.15em] text-ink/60">
-            Điện thoại
+            {t("phoneLabel")}
           </label>
           <input name="phone" type="tel" defaultValue={profile?.phone ?? ""} className={inputClass} />
         </div>
         <div>
           <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.15em] text-ink/60">
-            Địa chỉ
+            {t("addressLabel")}
           </label>
           <input name="address" type="text" defaultValue={profile?.address ?? ""} className={inputClass} />
         </div>
@@ -63,7 +65,7 @@ export function AccountForm({ email, profile }: { email: string; profile: Profil
           disabled={pending}
           className="inline-flex h-13 w-full items-center justify-center bg-ink text-[13px] font-semibold uppercase tracking-[0.14em] text-paper transition-transform hover:scale-[1.01] disabled:opacity-60"
         >
-          {pending ? "Đang lưu..." : "Lưu thay đổi"}
+          {pending ? t("saving") : t("save")}
         </button>
       </form>
 
@@ -72,7 +74,7 @@ export function AccountForm({ email, profile }: { email: string; profile: Profil
         onClick={handleLogout}
         className="w-full border border-ink/15 py-3.5 text-[13px] font-semibold uppercase tracking-[0.14em] text-ink/70 transition-colors hover:border-ink hover:text-ink"
       >
-        Đăng xuất
+        {t("logout")}
       </button>
     </div>
   );

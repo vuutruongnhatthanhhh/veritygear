@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { formatVnd } from "@/lib/format";
@@ -40,12 +40,6 @@ export async function generateMetadata({
   };
 }
 
-const FEATURES = [
-  { label: "Bảo hành 24 tháng", desc: "Đổi mới nếu lỗi kỹ thuật" },
-  { label: "Đổi trả 30 ngày", desc: "Không cần lý do" },
-  { label: "Giao hàng toàn quốc", desc: "Miễn phí từ 1.500.000₫" },
-];
-
 export default async function ProductDetailPage({
   params,
 }: {
@@ -53,8 +47,16 @@ export default async function ProductDetailPage({
 }) {
   const { slug } = await params;
   const locale = await getLocale();
+  const t = await getTranslations("productDetail");
+  const tNav = await getTranslations("nav");
   const supabase = await createClient();
   const pick = (vi: string, en: string) => (locale === "en" ? en || vi : vi);
+
+  const FEATURES = [
+    { label: t("warrantyLabel"), desc: t("warrantyDesc") },
+    { label: t("returnLabel"), desc: t("returnDesc") },
+    { label: t("shippingLabel"), desc: t("shippingDesc") },
+  ];
 
   const { data: row } = await supabase
     .from("products")
@@ -114,11 +116,11 @@ export default async function ProductDetailPage({
       <div className="mx-auto max-w-[1600px] px-6 pb-4 pt-24 sm:px-10 sm:pt-28">
         <nav className="flex flex-wrap items-center gap-2 text-[11px] font-medium uppercase tracking-[0.12em] text-ink/40">
           <Link href="/" className="transition-colors hover:text-ink">
-            Trang chủ
+            {tNav("trangChu")}
           </Link>
           <span>/</span>
           <Link href="/san-pham" className="transition-colors hover:text-ink">
-            Sản phẩm
+            {tNav("sanPham")}
           </Link>
           <span>/</span>
           <span className="text-ink/70">{product.name}</span>

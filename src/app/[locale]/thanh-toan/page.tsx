@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getLocale } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import CheckoutView from "@/components/checkout/CheckoutView";
 
 export const metadata: Metadata = {
@@ -25,9 +26,11 @@ export default async function CheckoutPage() {
     return;
   }
 
-  const [{ data: profile }, { data: settings }] = await Promise.all([
+  const admin = createAdminClient();
+  const [{ data: profile }, { data: settings }, { data: ghnSettings }] = await Promise.all([
     supabase.from("profiles").select("full_name, phone, address").eq("id", user.id).single(),
     supabase.from("shipping_settings").select("free_shipping_threshold, shipping_fee").eq("id", 1).single(),
+    admin.from("ghn_settings").select("enabled").eq("id", 1).single(),
   ]);
 
   return (
@@ -42,6 +45,7 @@ export default async function CheckoutPage() {
         freeShippingThreshold: settings?.free_shipping_threshold ?? DEFAULT_FREE_SHIPPING_THRESHOLD,
         shippingFee: settings?.shipping_fee ?? DEFAULT_SHIPPING_FEE,
       }}
+      ghnEnabled={ghnSettings?.enabled ?? false}
     />
   );
 }

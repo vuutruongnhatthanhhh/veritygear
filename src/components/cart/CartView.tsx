@@ -1,31 +1,29 @@
 "use client";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { useCart } from "@/components/providers/CartProvider";
 import { formatVnd } from "@/lib/format";
 
 export default function CartView({ freeShippingThreshold }: { freeShippingThreshold: number }) {
+  const t = useTranslations("cart");
+  const tNav = useTranslations("nav");
   const { items, subtotal, setQty, removeItem } = useCart();
 
   if (items.length === 0) {
     return (
       <div className="mx-auto flex max-w-[1600px] flex-col items-center px-6 py-32 text-center sm:px-10">
-        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.35em] text-ink/40">
-          Giỏ hàng
-        </p>
+        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.35em] text-ink/40">{t("eyebrow")}</p>
         <h1 className="font-display text-3xl font-bold uppercase leading-[1.05] sm:text-4xl">
-          Giỏ hàng của bạn đang trống
+          {t("emptyHeading")}
         </h1>
-        <p className="mt-4 max-w-sm text-[15px] leading-relaxed text-ink/60">
-          Khám phá bộ sưu tập phụ kiện gaming cao cấp của VERITY GEAR và thêm
-          sản phẩm bạn thích vào giỏ.
-        </p>
+        <p className="mt-4 max-w-sm text-[15px] leading-relaxed text-ink/60">{t("emptyBody")}</p>
         <Link
           href="/san-pham"
           className="mt-8 inline-flex h-13 items-center bg-ink px-8 text-[13px] font-semibold uppercase tracking-[0.14em] text-paper transition-transform hover:scale-[1.02]"
         >
-          Tiếp tục mua sắm
+          {t("continueShopping")}
         </Link>
       </div>
     );
@@ -38,17 +36,15 @@ export default function CartView({ freeShippingThreshold }: { freeShippingThresh
       <div className="mx-auto max-w-[1600px] px-6 pb-4 pt-24 sm:px-10 sm:pt-28">
         <nav className="flex flex-wrap items-center gap-2 text-[11px] font-medium uppercase tracking-[0.12em] text-ink/40">
           <Link href="/" className="transition-colors hover:text-ink">
-            Trang chủ
+            {tNav("trangChu")}
           </Link>
           <span>/</span>
-          <span className="text-ink/70">Giỏ hàng</span>
+          <span className="text-ink/70">{t("eyebrow")}</span>
         </nav>
       </div>
 
       <section className="mx-auto max-w-[1600px] px-6 py-10 sm:px-10 sm:py-14">
-        <h1 className="font-display text-3xl font-bold uppercase leading-[1.05] sm:text-4xl">
-          Giỏ hàng
-        </h1>
+        <h1 className="font-display text-3xl font-bold uppercase leading-[1.05] sm:text-4xl">{t("heading")}</h1>
 
         <div className="mt-10 grid grid-cols-1 gap-12 lg:grid-cols-3 lg:gap-16">
           <div className="flex flex-col divide-y divide-ink/10 lg:col-span-2">
@@ -82,10 +78,10 @@ export default function CartView({ freeShippingThreshold }: { freeShippingThresh
                     <button
                       type="button"
                       onClick={() => removeItem(item.slug)}
-                      aria-label={`Xóa ${item.name} khỏi giỏ`}
+                      aria-label={t("removeAria", { name: item.name })}
                       className="text-[11px] font-semibold uppercase tracking-[0.1em] text-ink/40 transition-colors hover:text-ink"
                     >
-                      Xóa
+                      {t("remove")}
                     </button>
                   </div>
 
@@ -94,7 +90,7 @@ export default function CartView({ freeShippingThreshold }: { freeShippingThresh
                       <button
                         type="button"
                         onClick={() => setQty(item.slug, item.qty - 1)}
-                        aria-label="Giảm số lượng"
+                        aria-label={t("decreaseAria")}
                         className="flex h-full w-9 items-center justify-center text-ink/60 transition-colors hover:text-ink"
                       >
                         −
@@ -105,7 +101,7 @@ export default function CartView({ freeShippingThreshold }: { freeShippingThresh
                       <button
                         type="button"
                         onClick={() => setQty(item.slug, item.qty + 1)}
-                        aria-label="Tăng số lượng"
+                        aria-label={t("increaseAria")}
                         className="flex h-full w-9 items-center justify-center text-ink/60 transition-colors hover:text-ink"
                       >
                         +
@@ -121,22 +117,18 @@ export default function CartView({ freeShippingThreshold }: { freeShippingThresh
           </div>
 
           <div className="h-fit border border-ink/10 p-6 sm:p-8 lg:sticky lg:top-24">
-            <h2 className="text-[13px] font-semibold uppercase tracking-[0.14em]">
-              Tóm tắt đơn hàng
-            </h2>
+            <h2 className="text-[13px] font-semibold uppercase tracking-[0.14em]">{t("summaryHeading")}</h2>
 
             <div className="mt-6 flex items-center justify-between text-sm">
-              <span className="text-ink/60">Tạm tính</span>
+              <span className="text-ink/60">{t("subtotal")}</span>
               <span className="font-semibold">{formatVnd(subtotal)}</span>
             </div>
             <p className="mt-3 text-[13px] leading-relaxed text-ink/50">
-              {remaining > 0
-                ? `Mua thêm ${formatVnd(remaining)} để được miễn phí vận chuyển.`
-                : "Đơn hàng của bạn được miễn phí vận chuyển."}
+              {remaining > 0 ? t("remaining", { amount: formatVnd(remaining) }) : t("freeShippingReached")}
             </p>
 
             <div className="mt-6 flex items-center justify-between border-t border-ink/10 pt-6 text-base">
-              <span className="font-semibold">Tổng cộng</span>
+              <span className="font-semibold">{t("total")}</span>
               <span className="font-display text-xl font-bold">
                 {formatVnd(subtotal)}
               </span>
@@ -146,13 +138,13 @@ export default function CartView({ freeShippingThreshold }: { freeShippingThresh
               href="/thanh-toan"
               className="mt-6 flex h-13 w-full items-center justify-center bg-ink px-8 text-[13px] font-semibold uppercase tracking-[0.14em] text-paper transition-transform hover:scale-[1.02]"
             >
-              Tiến hành thanh toán
+              {t("checkout")}
             </Link>
             <Link
               href="/san-pham"
               className="mt-3 flex h-13 w-full items-center justify-center border border-ink/20 px-8 text-[13px] font-semibold uppercase tracking-[0.14em] text-ink transition-colors hover:border-ink"
             >
-              Tiếp tục mua sắm
+              {t("continueShopping")}
             </Link>
           </div>
         </div>

@@ -45,14 +45,6 @@ export type NewsCategory = {
 export const ORDER_STATUSES = ["pending", "confirmed", "shipping", "completed", "cancelled"] as const;
 export type OrderStatus = (typeof ORDER_STATUSES)[number];
 
-export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
-  pending: "Chờ xác nhận",
-  confirmed: "Đã xác nhận",
-  shipping: "Đang giao",
-  completed: "Hoàn tất",
-  cancelled: "Đã hủy",
-};
-
 export type OrderItem = {
   productSlug: string;
   productName: string;

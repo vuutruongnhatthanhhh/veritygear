@@ -44,6 +44,7 @@ export default async function ArticlePage({
   const { slug } = await params;
   const locale = await getLocale();
   const t = await getTranslations("news");
+  const tNav = await getTranslations("nav");
   const supabase = await createClient();
   const pick = (vi: string, en: string) => (locale === "en" ? en || vi : vi);
 
@@ -97,11 +98,11 @@ export default async function ArticlePage({
       <div className="mx-auto max-w-[1600px] px-6 pb-4 pt-24 sm:px-10 sm:pt-28">
         <nav className="flex flex-wrap items-center gap-2 text-[11px] font-medium uppercase tracking-[0.12em] text-ink">
           <Link href="/" className="transition-colors hover:text-ink">
-            Trang chủ
+            {tNav("trangChu")}
           </Link>
           <span>/</span>
           <Link href="/tin-tuc" className="transition-colors hover:text-ink">
-            Tin tức
+            {tNav("tinTuc")}
           </Link>
         </nav>
       </div>
@@ -135,10 +136,10 @@ export default async function ArticlePage({
         <section className="border-t border-ink/10 px-6 py-20 sm:px-10 sm:py-28">
           <div className="mx-auto max-w-[1600px]">
             <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.35em] text-ink">
-              Đọc thêm
+              {t("readMoreEyebrow")}
             </p>
             <h2 className="mb-12 max-w-lg font-display text-3xl font-bold uppercase leading-[1.05] sm:text-4xl">
-              Bài viết liên quan
+              {t("relatedHeading")}
             </h2>
             <div className="grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
               {related.map((a) => (

@@ -1,4 +1,4 @@
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -7,6 +7,7 @@ import { AccountForm } from "./account-form";
 export const metadata = { title: "Tài khoản — VERITY GEAR" };
 
 export default async function TaiKhoanPage() {
+  const t = await getTranslations("account");
   const supabase = await createClient();
   const {
     data: { user },
@@ -27,10 +28,10 @@ export default async function TaiKhoanPage() {
   return (
     <section className="mx-auto max-w-xl px-6 py-32">
       <p className="mb-4 text-center text-[11px] font-semibold uppercase tracking-[0.35em] text-ink">
-        Tài khoản
+        {t("eyebrow")}
       </p>
       <h1 className="mb-8 text-center font-display text-3xl font-bold uppercase leading-tight sm:text-4xl">
-        Thông tin của bạn
+        {t("heading")}
       </h1>
 
       <AccountForm email={user.email ?? ""} profile={profile} />
@@ -39,7 +40,7 @@ export default async function TaiKhoanPage() {
         href="/tai-khoan/don-hang"
         className="mt-6 flex h-13 w-full items-center justify-center border border-ink/15 text-[13px] font-semibold uppercase tracking-[0.14em] text-ink/70 transition-colors hover:border-ink hover:text-ink"
       >
-        Đơn hàng của tôi
+        {t("myOrders")}
       </Link>
     </section>
   );

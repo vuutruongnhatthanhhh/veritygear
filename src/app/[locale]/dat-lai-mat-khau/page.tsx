@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
+import { useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -8,6 +9,8 @@ const inputClass =
   "w-full border border-ink/15 bg-ink/[0.03] px-4 py-3.5 text-[14px] text-ink placeholder:text-ink/35 outline-none transition-colors focus:border-ink";
 
 export default function DatLaiMatKhauPage() {
+  const t = useTranslations("auth.resetPassword");
+  const tAccount = useTranslations("account");
   const router = useRouter();
   const supabase = createClient();
 
@@ -38,11 +41,11 @@ export default function DatLaiMatKhauPage() {
     const confirmPassword = formData.get("confirmPassword") as string;
 
     if (password !== confirmPassword) {
-      setError("Mật khẩu xác nhận không khớp");
+      setError(t("errorMismatch"));
       return;
     }
     if (password.length < 6) {
-      setError("Mật khẩu phải có ít nhất 6 ký tự");
+      setError(t("errorTooShort"));
       return;
     }
 
@@ -63,27 +66,25 @@ export default function DatLaiMatKhauPage() {
   return (
     <section className="mx-auto flex min-h-[75vh] max-w-md flex-col justify-center px-6 py-32">
       <p className="mb-4 text-center text-[11px] font-semibold uppercase tracking-[0.35em] text-ink">
-        Tài khoản
+        {tAccount("eyebrow")}
       </p>
       <h1 className="mb-3 text-center font-display text-3xl font-bold uppercase leading-tight sm:text-4xl">
-        Đặt lại mật khẩu
+        {t("heading")}
       </h1>
-      <p className="mb-8 text-center text-[14px] text-ink/60">Nhập mật khẩu mới cho tài khoản của bạn.</p>
+      <p className="mb-8 text-center text-[14px] text-ink/60">{t("description")}</p>
 
       {success ? (
         <div className="border border-ink/15 bg-ink/[0.03] p-8 text-center">
-          <p className="font-display text-lg font-bold uppercase">Đã đặt lại mật khẩu!</p>
-          <p className="mt-2 text-[14px] text-ink/60">Đang chuyển hướng...</p>
+          <p className="font-display text-lg font-bold uppercase">{t("successHeading")}</p>
+          <p className="mt-2 text-[14px] text-ink/60">{t("successBody")}</p>
         </div>
       ) : checking ? (
-        <p className="text-center text-[14px] text-ink/60">Đang kiểm tra liên kết...</p>
+        <p className="text-center text-[14px] text-ink/60">{t("checking")}</p>
       ) : !hasRecoverySession ? (
         <div className="space-y-4 text-center">
-          <p className="text-[14px] text-ink/60">
-            Liên kết không hợp lệ hoặc đã hết hạn. Vui lòng yêu cầu liên kết mới.
-          </p>
+          <p className="text-[14px] text-ink/60">{t("invalidLink")}</p>
           <Link href="/quen-mat-khau" className="text-[13px] font-semibold text-ink underline underline-offset-4">
-            Yêu cầu liên kết mới
+            {t("requestNewLink")}
           </Link>
         </div>
       ) : (
@@ -93,13 +94,13 @@ export default function DatLaiMatKhauPage() {
           )}
           <div>
             <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.15em] text-ink/60">
-              Mật khẩu mới
+              {t("newPasswordLabel")}
             </label>
             <input required name="password" type="password" autoComplete="new-password" placeholder="••••••••" className={inputClass} />
           </div>
           <div>
             <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.15em] text-ink/60">
-              Xác nhận mật khẩu
+              {t("confirmPasswordLabel")}
             </label>
             <input
               required
@@ -116,7 +117,7 @@ export default function DatLaiMatKhauPage() {
             disabled={submitting}
             className="inline-flex h-13 w-full items-center justify-center bg-ink text-[13px] font-semibold uppercase tracking-[0.14em] text-paper transition-transform hover:scale-[1.01] disabled:opacity-60"
           >
-            {submitting ? "Đang lưu..." : "Đặt lại mật khẩu"}
+            {submitting ? t("submitting") : t("submit")}
           </button>
         </form>
       )}
