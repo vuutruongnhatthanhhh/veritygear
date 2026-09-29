@@ -10,11 +10,17 @@ export default async function Footer() {
   const locale = await getLocale();
   const pick = (vi: string, en: string) => (locale === "en" ? en || vi : vi);
   const supabase = await createClient();
-  const [{ data: socialRow }, { data: categoryRows }, { data: footerRow }] = await Promise.all([
-    supabase.from("site_social_links").select("*").eq("id", 1).single(),
-    supabase.from("product_categories").select("slug, name_vi, name_en").order("sort_order"),
-    supabase.from("site_footer").select("*").eq("id", 1).single(),
-  ]);
+  const [{ data: socialRow }, { data: categoryRows }, { data: footerRow }, { data: customPageRows }] =
+    await Promise.all([
+      supabase.from("site_social_links").select("*").eq("id", 1).single(),
+      supabase.from("product_categories").select("slug, name_vi, name_en").order("sort_order"),
+      supabase.from("site_footer").select("*").eq("id", 1).single(),
+      supabase
+        .from("custom_pages")
+        .select("slug, title_vi, title_en")
+        .eq("is_active", true)
+        .order("sort_order"),
+    ]);
   const socialLinks = toSocialLinks(socialRow);
   const tagline = footerRow ? pick(footerRow.tagline_vi, footerRow.tagline_en) : "";
 
@@ -32,6 +38,10 @@ export default async function Footer() {
         { label: t("nav.cotMoc"), href: "/cot-moc" },
         { label: t("nav.gioiThieu"), href: "/gioi-thieu" },
         { label: t("nav.tinTuc"), href: "/tin-tuc" },
+        ...(customPageRows ?? []).map((p) => ({
+          label: pick(p.title_vi, p.title_en),
+          href: `/${p.slug}`,
+        })),
       ],
     },
     {

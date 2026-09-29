@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
@@ -7,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { formatVnd } from "@/lib/format";
 import type { Product } from "@/lib/types";
 import ProductActions from "@/components/product/ProductActions";
+import ProductGallery from "@/components/product/ProductGallery";
 import SpecsCard from "@/components/product/SpecsCard";
 import RelatedProducts from "@/components/product/RelatedProducts";
 import Newsletter from "@/components/Newsletter";
@@ -67,11 +67,10 @@ export default async function ProductDetailPage({
 
   if (!row) notFound();
 
-  const { data: specRows } = await supabase
-    .from("product_specs")
-    .select("*")
-    .eq("product_id", row.id)
-    .order("sort_order");
+  const [{ data: specRows }, { data: imageRows }] = await Promise.all([
+    supabase.from("product_specs").select("*").eq("product_id", row.id).order("sort_order"),
+    supabase.from("product_images").select("image_url").eq("product_id", row.id).order("sort_order"),
+  ]);
 
   const product: Product = {
     slug: row.slug,
@@ -81,6 +80,7 @@ export default async function ProductDetailPage({
     price: row.price,
     compareAtPrice: row.compare_at_price ?? undefined,
     image: row.image_url ?? "",
+    images: [row.image_url, ...(imageRows ?? []).map((i) => i.image_url)].filter((url): url is string => !!url),
     badge: pick(row.badge_vi ?? "", row.badge_en ?? "") || undefined,
     description: pick(row.description_vi, row.description_en),
     specs: (specRows ?? []).map((s) => ({ label: pick(s.label_vi, s.label_en), value: pick(s.value_vi, s.value_en) })),
@@ -129,21 +129,7 @@ export default async function ProductDetailPage({
 
       <section className="mx-auto max-w-[1600px] px-6 py-10 sm:px-10 sm:py-14">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16">
-          <div className="relative aspect-square overflow-hidden bg-ink/5 lg:sticky lg:top-24 lg:self-start">
-            <Image
-              src={product.image}
-              alt={product.name}
-              fill
-              priority
-              sizes="(min-width: 1024px) 45vw, 100vw"
-              className="object-cover"
-            />
-            {product.badge && (
-              <span className="absolute left-4 top-4 bg-ink px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-paper">
-                {product.badge}
-              </span>
-            )}
-          </div>
+          <ProductGallery images={product.images ?? [product.image]} alt={product.name} badge={product.badge} />
 
           <div>
             <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink">

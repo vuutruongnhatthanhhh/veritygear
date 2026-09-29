@@ -3,6 +3,13 @@
     "title": "VERITY GEAR — Premium Gaming Gear",
     "description": "VERITY GEAR — a premium gaming accessories brand: mechanical keyboards, mice, headsets, and mousepads crafted for gamers who refuse to compromise."
   },
+  "notFound": {
+    "eyebrow": "Error 404",
+    "heading": "Page not found",
+    "body": "The page you're looking for doesn't exist or has been moved. Head back home or explore our products.",
+    "backHome": "Back to home",
+    "exploreProducts": "Explore products"
+  },
   "nav": {
     "sanPham": "Products",
     "cotMoc": "Milestones",

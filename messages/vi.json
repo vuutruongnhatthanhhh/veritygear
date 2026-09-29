@@ -3,6 +3,13 @@
     "title": "VERITY GEAR — Phụ Kiện Gaming Cao Cấp",
     "description": "VERITY GEAR — thương hiệu phụ kiện gaming cao cấp: bàn phím cơ, chuột, tai nghe và lót chuột được chế tác cho những game thủ không khoan nhượng."
   },
+  "notFound": {
+    "eyebrow": "Lỗi 404",
+    "heading": "Không tìm thấy trang",
+    "body": "Trang bạn tìm không tồn tại hoặc đã được di chuyển. Hãy quay về trang chủ hoặc khám phá các sản phẩm của chúng tôi.",
+    "backHome": "Về trang chủ",
+    "exploreProducts": "Khám phá sản phẩm"
+  },
   "nav": {
     "sanPham": "Sản phẩm",
     "cotMoc": "Cột mốc",

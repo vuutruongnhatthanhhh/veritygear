@@ -11,6 +11,10 @@ export type Product = {
   price: number;
   compareAtPrice?: number;
   image: string;
+  // Full gallery for the product detail page (cover image first, then any
+  // extra photos) — undefined/empty wherever only the cover image is needed
+  // (cards, cart, related products).
+  images?: string[];
   badge?: string;
   description: string;
   specs: { label: string; value: string }[];
