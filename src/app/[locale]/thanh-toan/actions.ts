@@ -1,94 +1,18 @@
 "use server";
 
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getTransporter, hasSmtpConfig, emailLayout, emailButtonHtml } from "@/lib/mailer";
-import { formatVnd } from "@/lib/format";
 import { ghnCalculateFee } from "@/lib/ghn";
+import { getPayOS } from "@/lib/payos";
+import { sendNewOrderNotification } from "@/lib/orderNotification";
 
-export type CheckoutState = { error?: string; orderCode?: string } | null;
+export type CheckoutState = { error?: string; orderCode?: string; paymentUrl?: string } | null;
 
 const DEFAULT_FREE_SHIPPING_THRESHOLD = 1500000;
 const DEFAULT_SHIPPING_FEE = 35000;
 
 type CartItemInput = { slug: string; name: string; image: string; price: number; qty: number };
-
-type NewOrderEmailFields = {
-  orderCode: string;
-  fullName: string;
-  phone: string;
-  email: string;
-  address: string;
-  wardName: string;
-  districtName: string;
-  city: string;
-  note: string;
-  items: CartItemInput[];
-  subtotal: number;
-  shippingFee: number;
-  total: number;
-};
-
-function fullAddress(o: NewOrderEmailFields): string {
-  return [o.address, o.wardName, o.districtName, o.city].filter(Boolean).join(", ");
-}
-
-function newOrderEmailHtml(o: NewOrderEmailFields) {
-  const itemRows = o.items
-    .map(
-      (i) =>
-        `<p style="color:#444; line-height:1.6; margin:4px 0;">${i.name} × ${i.qty} — ${formatVnd(i.price * i.qty)}</p>`,
-    )
-    .join("");
-
-  return emailLayout(`
-    <h2 style="margin:0 0 12px; font-size: 20px;">Đơn hàng mới: ${o.orderCode}</h2>
-    <p style="color:#444; line-height:1.6;"><strong>Khách hàng:</strong> ${o.fullName}</p>
-    <p style="color:#444; line-height:1.6;"><strong>Điện thoại:</strong> ${o.phone}</p>
-    <p style="color:#444; line-height:1.6;"><strong>Email:</strong> ${o.email}</p>
-    <p style="color:#444; line-height:1.6;"><strong>Địa chỉ:</strong> ${fullAddress(o)}</p>
-    ${o.note ? `<p style="color:#444; line-height:1.6;"><strong>Ghi chú:</strong> ${o.note}</p>` : ""}
-    <p style="color:#444; line-height:1.6;"><strong>Thanh toán:</strong> Khi nhận hàng (COD)</p>
-    <hr style="border:none; border-top:1px solid #eee; margin:20px 0;" />
-    ${itemRows}
-    <p style="color:#444; line-height:1.6; margin-top:16px;">Tạm tính: ${formatVnd(o.subtotal)}</p>
-    <p style="color:#444; line-height:1.6;">Vận chuyển: ${o.shippingFee === 0 ? "Miễn phí" : formatVnd(o.shippingFee)}</p>
-    <p style="color:#0A0A0A; line-height:1.6; font-weight:700;">Tổng cộng: ${formatVnd(o.total)}</p>
-    ${emailButtonHtml(`mailto:${o.email}`, "LIÊN HỆ KHÁCH HÀNG")}
-  `);
-}
-
-function newOrderEmailText(o: NewOrderEmailFields) {
-  const itemLines = o.items.map((i) => `${i.name} x${i.qty} - ${formatVnd(i.price * i.qty)}`).join("\n");
-  return `Đơn hàng mới: ${o.orderCode}\n\nKhách hàng: ${o.fullName}\nĐiện thoại: ${o.phone}\nEmail: ${o.email}\nĐịa chỉ: ${fullAddress(o)}${
-    o.note ? `\nGhi chú: ${o.note}` : ""
-  }\nThanh toán: Khi nhận hàng (COD)\n\n${itemLines}\n\nTạm tính: ${formatVnd(o.subtotal)}\nVận chuyển: ${
-    o.shippingFee === 0 ? "Miễn phí" : formatVnd(o.shippingFee)
-  }\nTổng cộng: ${formatVnd(o.total)}`;
-}
-
-async function sendNewOrderNotification(fields: NewOrderEmailFields) {
-  if (!hasSmtpConfig()) return;
-
-  try {
-    const admin = createAdminClient();
-    const { data: settings } = await admin.from("contact_settings").select("recipient_email").eq("id", 1).single();
-    const recipientEmail = settings?.recipient_email;
-    if (!recipientEmail) return;
-
-    const transporter = getTransporter();
-    await transporter.sendMail({
-      from: `"VERITY GEAR" <${process.env.SMTP_USER}>`,
-      to: recipientEmail,
-      replyTo: fields.email,
-      subject: `Đơn hàng mới: ${fields.orderCode}`,
-      text: newOrderEmailText(fields),
-      html: newOrderEmailHtml(fields),
-    });
-  } catch (err) {
-    console.error("Failed to send new order notification email:", err);
-  }
-}
 
 function parseItems(raw: string | null): CartItemInput[] {
   if (!raw) return [];
@@ -110,6 +34,13 @@ function parseItems(raw: string | null): CartItemInput[] {
   }
 }
 
+async function siteOrigin(): Promise<string> {
+  const h = await headers();
+  const proto = h.get("x-forwarded-proto") ?? "https";
+  const host = h.get("host");
+  return `${proto}://${host}`;
+}
+
 export async function placeOrder(_prev: CheckoutState, formData: FormData): Promise<CheckoutState> {
   const supabase = await createClient();
   const {
@@ -125,6 +56,7 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
   const email = (formData.get("email") as string)?.trim();
   const address = (formData.get("address") as string)?.trim();
   const note = ((formData.get("note") as string) ?? "").trim();
+  const paymentMethod: "cod" | "transfer" = (formData.get("payment") as string) === "transfer" ? "transfer" : "cod";
 
   const toProvinceIdRaw = (formData.get("to_province_id") as string) || "";
   const toProvinceName = ((formData.get("to_province_name") as string) ?? "").trim();
@@ -193,7 +125,7 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
       address,
       city,
       note,
-      payment_method: "cod",
+      payment_method: paymentMethod,
       subtotal,
       shipping_fee: shippingFee,
       total,
@@ -223,7 +155,7 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
 
   if (itemsError) return { error: itemsError.message };
 
-  await sendNewOrderNotification({
+  const emailFields = {
     orderCode: order.order_code,
     fullName,
     phone,
@@ -237,7 +169,31 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
     subtotal,
     shippingFee,
     total,
-  });
+    paymentMethod,
+  };
 
-  return { orderCode: order.order_code };
+  if (paymentMethod === "cod") {
+    await sendNewOrderNotification(emailFields);
+    return { orderCode: order.order_code };
+  }
+
+  // Bank transfer: hold off on the notification email until PayOS confirms
+  // payment via webhook — send it now would mean unpaid orders get treated
+  // the same as confirmed ones.
+  try {
+    const origin = await siteOrigin();
+    const paymentLink = await getPayOS().paymentRequests.create({
+      orderCode: order.id,
+      amount: total,
+      description: `DH ${order.order_code}`.slice(0, 25),
+      items: items.map((i) => ({ name: i.name, quantity: i.qty, price: i.price })),
+      returnUrl: `${origin}/thanh-toan/ket-qua?orderCode=${order.order_code}`,
+      cancelUrl: `${origin}/thanh-toan/ket-qua?orderCode=${order.order_code}`,
+    });
+    return { paymentUrl: paymentLink.checkoutUrl };
+  } catch (err) {
+    console.error("Failed to create PayOS payment link:", err);
+    await admin.from("orders").delete().eq("id", order.id);
+    return { error: "Không thể tạo link thanh toán chuyển khoản. Vui lòng thử lại hoặc chọn COD." };
+  }
 }

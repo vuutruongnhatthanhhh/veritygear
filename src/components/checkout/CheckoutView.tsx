@@ -37,6 +37,7 @@ export default function CheckoutView({
   const [ghnFee, setGhnFee] = useState<number | null>(null);
   const [feeLoading, setFeeLoading] = useState(false);
   const [ghnFeeError, setGhnFeeError] = useState<string | null>(null);
+  const [redirecting, setRedirecting] = useState(false);
 
   const flatShippingCost = subtotal >= shipping.freeShippingThreshold ? 0 : shipping.shippingFee;
   const shippingCost = ghnEnabled && ghnFee !== null ? ghnFee : flatShippingCost;
@@ -46,6 +47,16 @@ export default function CheckoutView({
     if (state?.orderCode) clear();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state?.orderCode]);
+
+  useEffect(() => {
+    if (state?.paymentUrl) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setRedirecting(true);
+      clear();
+      window.location.href = state.paymentUrl;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state?.paymentUrl]);
 
   async function handleWardSelected(selection: WardSelection) {
     setFeeLoading(true);
@@ -220,12 +231,9 @@ export default function CheckoutView({
                   />
                   <span className="text-sm font-medium">{t("cod")}</span>
                 </label>
-                <label className="flex cursor-not-allowed items-center gap-3 border border-ink/20 px-5 py-4 text-ink/40 transition-colors">
-                  <input type="radio" name="payment" value="transfer" disabled className="h-4 w-4 accent-ink" />
+                <label className="flex cursor-pointer items-center gap-3 border border-ink/20 px-5 py-4 transition-colors has-checked:border-ink">
+                  <input type="radio" name="payment" value="transfer" className="h-4 w-4 accent-ink" />
                   <span className="text-sm font-medium">{t("transfer")}</span>
-                  <span className="ml-auto shrink-0 rounded-full border border-ink/20 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.08em]">
-                    {t("comingSoon")}
-                  </span>
                 </label>
               </div>
             </div>
@@ -284,10 +292,10 @@ export default function CheckoutView({
 
             <button
               type="submit"
-              disabled={pending}
+              disabled={pending || redirecting}
               className="mt-6 h-13 w-full bg-ink px-8 text-[13px] font-semibold uppercase tracking-[0.14em] text-paper transition-transform hover:scale-[1.02] disabled:opacity-60"
             >
-              {pending ? t("submitting") : t("submit")}
+              {redirecting ? t("redirecting") : pending ? t("submitting") : t("submit")}
             </button>
           </div>
         </form>

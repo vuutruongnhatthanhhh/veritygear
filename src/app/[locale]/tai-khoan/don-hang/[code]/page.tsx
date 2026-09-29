@@ -80,6 +80,15 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ co
         <div>
           <h2 className="mb-3 text-[13px] font-semibold uppercase tracking-[0.14em]">{t("paymentHeading")}</h2>
           <p className="text-sm text-ink">{order.payment_method === "cod" ? t("cod") : t("transfer")}</p>
+          {order.payment_method === "transfer" && (
+            <p className="mt-1 text-sm text-ink/60">
+              {order.payment_status === "paid"
+                ? t("paymentPaid")
+                : order.payment_status === "cancelled"
+                  ? t("paymentCancelled")
+                  : t("paymentUnpaid")}
+            </p>
+          )}
         </div>
       </div>
 
