@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { formatVnd } from "@/lib/format";
 import type { OrderStatus } from "@/lib/types";
 
-export const metadata = { title: "Chi tiết đơn hàng — VERITY GEAR" };
+export const metadata = { title: "Chi tiết đơn hàng — VERITY GEAR", robots: { index: false, follow: false } };
 
 export default async function OrderDetailPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;

@@ -10,6 +10,18 @@
     "backHome": "Back to home",
     "exploreProducts": "Explore products"
   },
+  "seo": {
+    "aboutTitle": "About",
+    "aboutDescription": "The VERITY GEAR brand story — our mission, core values, and the journey of crafting premium gaming gear for gamers.",
+    "milestonesTitle": "Milestones",
+    "milestonesDescription": "The VERITY GEAR journey — memorable milestones from our founding to becoming a trusted premium gaming gear brand.",
+    "contactTitle": "Contact",
+    "contactDescription": "Get in touch with VERITY GEAR — showroom address, phone, support email, and a form to message our customer care team directly.",
+    "shopTitle": "Products",
+    "shopDescription": "The full VERITY GEAR gaming gear collection — mechanical keyboards, gaming mice, headsets, mousepads, and premium controllers.",
+    "newsTitle": "News",
+    "newsDescription": "The latest news from VERITY GEAR — product launches, esports events, and guides to choosing your gaming gear."
+  },
   "nav": {
     "sanPham": "Products",
     "cotMoc": "Milestones",

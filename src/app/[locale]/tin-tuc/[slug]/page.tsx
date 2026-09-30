@@ -5,8 +5,10 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { formatArticleDate } from "@/lib/format";
+import { pageMetadata, absoluteUrl } from "@/lib/seo";
 import type { Article } from "@/lib/types";
 import NewsCard from "@/components/news/NewsCard";
+import { ArticleJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 
 // Articles are managed live from the admin — no generateStaticParams here,
 // every request resolves the current catalog (same as the product detail page).
@@ -21,7 +23,7 @@ export async function generateMetadata({
   const supabase = await createClient();
   const { data: article } = await supabase
     .from("news_articles")
-    .select("title_vi, title_en, excerpt_vi, excerpt_en")
+    .select("title_vi, title_en, excerpt_vi, excerpt_en, image_url, published_at")
     .eq("slug", slug)
     .eq("is_active", true)
     .single();
@@ -30,10 +32,15 @@ export async function generateMetadata({
 
   const pick = (vi: string, en: string) => (locale === "en" ? en || vi : vi);
 
-  return {
-    title: `${pick(article.title_vi, article.title_en)} — VERITY GEAR`,
+  return pageMetadata({
+    locale,
+    path: `/tin-tuc/${slug}`,
+    title: pick(article.title_vi, article.title_en),
     description: pick(article.excerpt_vi, article.excerpt_en),
-  };
+    images: [article.image_url],
+    type: "article",
+    publishedTime: article.published_at ? new Date(article.published_at).toISOString() : undefined,
+  });
 }
 
 export default async function ArticlePage({
@@ -95,6 +102,20 @@ export default async function ArticlePage({
 
   return (
     <>
+      <ArticleJsonLd
+        headline={article.title}
+        description={article.excerpt}
+        image={article.image || undefined}
+        url={absoluteUrl(locale, `/tin-tuc/${slug}`)}
+        datePublished={row.published_at ? new Date(row.published_at).toISOString() : undefined}
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: tNav("trangChu"), url: absoluteUrl(locale, "/") },
+          { name: tNav("tinTuc"), url: absoluteUrl(locale, "/tin-tuc") },
+          { name: article.title, url: absoluteUrl(locale, `/tin-tuc/${slug}`) },
+        ]}
+      />
       <div className="mx-auto max-w-[1600px] px-6 pb-4 pt-24 sm:px-10 sm:pt-28">
         <nav className="flex flex-wrap items-center gap-2 text-[11px] font-medium uppercase tracking-[0.12em] text-ink">
           <Link href="/" className="transition-colors hover:text-ink">

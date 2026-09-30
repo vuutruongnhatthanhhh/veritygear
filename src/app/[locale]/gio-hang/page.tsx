@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 export const metadata: Metadata = {
   title: "Giỏ hàng — VERITY GEAR",
   description: "Xem lại sản phẩm trong giỏ hàng trước khi tiến hành thanh toán.",
+  robots: { index: false, follow: false },
 };
 
 const DEFAULT_FREE_SHIPPING_THRESHOLD = 1500000;

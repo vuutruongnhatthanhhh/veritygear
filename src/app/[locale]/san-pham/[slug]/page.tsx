@@ -4,12 +4,14 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { formatVnd } from "@/lib/format";
+import { pageMetadata, absoluteUrl } from "@/lib/seo";
 import type { Product } from "@/lib/types";
 import ProductActions from "@/components/product/ProductActions";
 import ProductGallery from "@/components/product/ProductGallery";
 import SpecsCard from "@/components/product/SpecsCard";
 import RelatedProducts from "@/components/product/RelatedProducts";
 import Newsletter from "@/components/Newsletter";
+import { ProductJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 
 // Products are managed live from the admin — no generateStaticParams here,
 // every request resolves the current catalog (same as every other
@@ -25,7 +27,7 @@ export async function generateMetadata({
   const supabase = await createClient();
   const { data: product } = await supabase
     .from("products")
-    .select("name, tagline_vi, tagline_en")
+    .select("name, tagline_vi, tagline_en, image_url")
     .eq("slug", slug)
     .eq("is_active", true)
     .single();
@@ -34,10 +36,13 @@ export async function generateMetadata({
 
   const tagline = locale === "en" ? product.tagline_en || product.tagline_vi : product.tagline_vi;
 
-  return {
-    title: `${product.name} — VERITY GEAR`,
+  return pageMetadata({
+    locale,
+    path: `/san-pham/${slug}`,
+    title: product.name,
     description: tagline,
-  };
+    images: [product.image_url],
+  });
 }
 
 export default async function ProductDetailPage({
@@ -113,6 +118,20 @@ export default async function ProductDetailPage({
 
   return (
     <>
+      <ProductJsonLd
+        name={product.name}
+        description={product.tagline}
+        image={product.image || undefined}
+        price={product.price}
+        url={absoluteUrl(locale, `/san-pham/${slug}`)}
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: tNav("trangChu"), url: absoluteUrl(locale, "/") },
+          { name: tNav("sanPham"), url: absoluteUrl(locale, "/san-pham") },
+          { name: product.name, url: absoluteUrl(locale, `/san-pham/${slug}`) },
+        ]}
+      />
       <div className="mx-auto max-w-[1600px] px-6 pb-4 pt-24 sm:px-10 sm:pt-28">
         <nav className="flex flex-wrap items-center gap-2 text-[11px] font-medium uppercase tracking-[0.12em] text-ink/40">
           <Link href="/" className="transition-colors hover:text-ink">

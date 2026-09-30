@@ -1,15 +1,22 @@
 import type { Metadata } from "next";
+import { getLocale, getTranslations } from "next-intl/server";
+import { pageMetadata } from "@/lib/seo";
 import ContactHero from "@/components/contact/ContactHero";
 import ContactInfoCards from "@/components/contact/ContactInfoCards";
 import ContactForm from "@/components/contact/ContactForm";
 import ContactMap from "@/components/contact/ContactMap";
 import ContactFaq from "@/components/contact/ContactFaq";
 
-export const metadata: Metadata = {
-  title: "Liên hệ — VERITY GEAR",
-  description:
-    "Liên hệ với VERITY GEAR — địa chỉ showroom, điện thoại, email hỗ trợ và biểu mẫu gửi tin nhắn trực tiếp cho đội ngũ chăm sóc khách hàng.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  const t = await getTranslations("seo");
+  return pageMetadata({
+    locale,
+    path: "/lien-he",
+    title: t("contactTitle"),
+    description: t("contactDescription"),
+  });
+}
 
 export default function ContactPage() {
   return (

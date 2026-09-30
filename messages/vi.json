@@ -10,6 +10,18 @@
     "backHome": "Về trang chủ",
     "exploreProducts": "Khám phá sản phẩm"
   },
+  "seo": {
+    "aboutTitle": "Giới thiệu",
+    "aboutDescription": "Câu chuyện thương hiệu VERITY GEAR — sứ mệnh, giá trị cốt lõi và hành trình chế tác phụ kiện gaming cao cấp cho game thủ.",
+    "milestonesTitle": "Cột mốc",
+    "milestonesDescription": "Hành trình phát triển của VERITY GEAR — các cột mốc đáng nhớ từ ngày thành lập đến khi trở thành thương hiệu phụ kiện gaming được tin dùng.",
+    "contactTitle": "Liên hệ",
+    "contactDescription": "Liên hệ với VERITY GEAR — địa chỉ showroom, điện thoại, email hỗ trợ và biểu mẫu gửi tin nhắn trực tiếp cho đội ngũ chăm sóc khách hàng.",
+    "shopTitle": "Sản phẩm",
+    "shopDescription": "Toàn bộ bộ sưu tập phụ kiện gaming VERITY GEAR — bàn phím cơ, chuột gaming, tai nghe, lót chuột và tay cầm cao cấp.",
+    "newsTitle": "Tin tức",
+    "newsDescription": "Cập nhật tin tức mới nhất từ VERITY GEAR — ra mắt sản phẩm, sự kiện esports và hướng dẫn chọn phụ kiện gaming."
+  },
   "nav": {
     "sanPham": "Sản phẩm",
     "cotMoc": "Cột mốc",

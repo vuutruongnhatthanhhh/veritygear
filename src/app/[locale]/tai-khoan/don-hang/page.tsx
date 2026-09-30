@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { formatVnd } from "@/lib/format";
 import type { OrderStatus } from "@/lib/types";
 
-export const metadata = { title: "Đơn hàng của tôi — VERITY GEAR" };
+export const metadata = { title: "Đơn hàng của tôi — VERITY GEAR", robots: { index: false, follow: false } };
 
 export default async function OrderHistoryPage() {
   const locale = await getLocale();

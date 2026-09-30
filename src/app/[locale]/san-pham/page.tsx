@@ -1,17 +1,23 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import ShopHero from "@/components/shop/ShopHero";
 import ProductsGrid from "@/components/shop/ProductsGrid";
 import Newsletter from "@/components/Newsletter";
 import { createClient } from "@/lib/supabase/server";
+import { pageMetadata } from "@/lib/seo";
 import type { Product, Category } from "@/lib/types";
 
-export const metadata: Metadata = {
-  title: "Sản phẩm — VERITY GEAR",
-  description:
-    "Toàn bộ bộ sưu tập phụ kiện gaming VERITY GEAR — bàn phím cơ, chuột gaming, tai nghe, lót chuột và tay cầm cao cấp.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  const t = await getTranslations("seo");
+  return pageMetadata({
+    locale,
+    path: "/san-pham",
+    title: t("shopTitle"),
+    description: t("shopDescription"),
+  });
+}
 
 export default async function ShopPage() {
   const locale = await getLocale();

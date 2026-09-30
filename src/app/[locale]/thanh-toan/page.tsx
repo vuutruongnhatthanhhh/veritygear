@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title: "Thanh toán — VERITY GEAR",
   description:
     "Hoàn tất thông tin giao hàng và thanh toán đơn hàng VERITY GEAR của bạn.",
+  robots: { index: false, follow: false },
 };
 
 const DEFAULT_FREE_SHIPPING_THRESHOLD = 1500000;

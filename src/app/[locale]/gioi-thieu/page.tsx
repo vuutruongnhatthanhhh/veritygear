@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { getLocale, getTranslations } from "next-intl/server";
+import { pageMetadata } from "@/lib/seo";
 import AboutHero from "@/components/about/AboutHero";
 import MissionStatement from "@/components/about/MissionStatement";
 import AboutStoryBlocks from "@/components/about/AboutStoryBlocks";
@@ -8,11 +10,16 @@ import Team from "@/components/about/Team";
 import Gallery from "@/components/about/Gallery";
 import AboutCta from "@/components/about/AboutCta";
 
-export const metadata: Metadata = {
-  title: "Giới thiệu — VERITY GEAR",
-  description:
-    "Câu chuyện thương hiệu VERITY GEAR — sứ mệnh, giá trị cốt lõi và hành trình chế tác phụ kiện gaming cao cấp cho game thủ.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  const t = await getTranslations("seo");
+  return pageMetadata({
+    locale,
+    path: "/gioi-thieu",
+    title: t("aboutTitle"),
+    description: t("aboutDescription"),
+  });
+}
 
 export default function AboutPage() {
   return (

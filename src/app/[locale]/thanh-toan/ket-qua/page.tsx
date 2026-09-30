@@ -4,7 +4,7 @@ import { redirect } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-export const metadata = { title: "Kết quả thanh toán — VERITY GEAR" };
+export const metadata = { title: "Kết quả thanh toán — VERITY GEAR", robots: { index: false, follow: false } };
 
 export default async function CheckoutResultPage({
   searchParams,

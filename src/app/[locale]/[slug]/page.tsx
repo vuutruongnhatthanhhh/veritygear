@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { pageMetadata } from "@/lib/seo";
 
 // Admin-authored static pages — no generateStaticParams, resolved live from
 // Supabase per request (same as every other admin-managed content page).
@@ -17,15 +18,28 @@ export async function generateMetadata({
   const supabase = await createClient();
   const { data: page } = await supabase
     .from("custom_pages")
-    .select("title_vi, title_en")
+    .select("title_vi, title_en, content_vi, content_en")
     .eq("slug", slug)
     .eq("is_active", true)
     .single();
 
   if (!page) return {};
 
-  const title = locale === "en" ? page.title_en || page.title_vi : page.title_vi;
-  return { title: `${title} — VERITY GEAR` };
+  const pick = (vi: string, en: string) => (locale === "en" ? en || vi : vi);
+  const title = pick(page.title_vi, page.title_en);
+  // Derive a description from the page's own content (strip HTML, clamp length).
+  const rawText = pick(page.content_vi, page.content_en)
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  const description = rawText.slice(0, 160);
+
+  return pageMetadata({
+    locale,
+    path: `/${slug}`,
+    title,
+    description,
+  });
 }
 
 export default async function CustomPage({

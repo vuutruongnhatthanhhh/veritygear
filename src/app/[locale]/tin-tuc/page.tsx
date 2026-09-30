@@ -6,13 +6,19 @@ import NewsGrid from "@/components/news/NewsGrid";
 import Newsletter from "@/components/Newsletter";
 import { createClient } from "@/lib/supabase/server";
 import { formatArticleDate } from "@/lib/format";
+import { pageMetadata } from "@/lib/seo";
 import type { Article, NewsCategory } from "@/lib/types";
 
-export const metadata: Metadata = {
-  title: "Tin tức — VERITY GEAR",
-  description:
-    "Cập nhật tin tức mới nhất từ VERITY GEAR — ra mắt sản phẩm, sự kiện esports và hướng dẫn chọn phụ kiện gaming.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  const t = await getTranslations("seo");
+  return pageMetadata({
+    locale,
+    path: "/tin-tuc",
+    title: t("newsTitle"),
+    description: t("newsDescription"),
+  });
+}
 
 export default async function NewsPage() {
   const locale = await getLocale();

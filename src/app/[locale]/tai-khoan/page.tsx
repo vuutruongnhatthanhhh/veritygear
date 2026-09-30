@@ -4,7 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AccountForm } from "./account-form";
 
-export const metadata = { title: "Tài khoản — VERITY GEAR" };
+export const metadata = { title: "Tài khoản — VERITY GEAR", robots: { index: false, follow: false } };
 
 export default async function TaiKhoanPage() {
   const t = await getTranslations("account");
