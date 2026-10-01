@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getTransporter, hasSmtpConfig, emailLayout, emailButtonHtml } from "@/lib/mailer";
+import { getTransporter, hasSmtpConfig, getMailFrom, emailLayout, emailButtonHtml } from "@/lib/mailer";
 import { isRateLimited, getClientIp } from "@/lib/rateLimit";
 
 function confirmSignupEmailHtml(fullName: string, actionLink: string) {
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
   try {
     const transporter = getTransporter();
     await transporter.sendMail({
-      from: `"VERITY GEAR" <${process.env.SMTP_USER}>`,
+      from: `"VERITY GEAR" <${getMailFrom()}>`,
       to: email,
       subject: "Xác nhận email đăng ký - VERITY GEAR",
       text: confirmSignupEmailText(fullName, actionLink),

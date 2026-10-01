@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getTransporter, hasSmtpConfig, emailLayout, emailButtonHtml } from "@/lib/mailer";
+import { getTransporter, hasSmtpConfig, getMailFrom, emailLayout, emailButtonHtml } from "@/lib/mailer";
 import { formatVnd } from "@/lib/format";
 
 type CartItemInput = { slug: string; name: string; image: string; price: number; qty: number };
@@ -74,7 +74,7 @@ export async function sendNewOrderNotification(fields: NewOrderEmailFields) {
 
     const transporter = getTransporter();
     await transporter.sendMail({
-      from: `"VERITY GEAR" <${process.env.SMTP_USER}>`,
+      from: `"VERITY GEAR" <${getMailFrom()}>`,
       to: recipientEmail,
       replyTo: fields.email,
       subject: `Đơn hàng mới: ${fields.orderCode}`,
