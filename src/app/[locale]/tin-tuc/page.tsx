@@ -1,16 +1,21 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import NewsHero from "@/components/news/NewsHero";
 import NewsGrid from "@/components/news/NewsGrid";
 import Newsletter from "@/components/Newsletter";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/public";
 import { formatArticleDate } from "@/lib/format";
 import { pageMetadata } from "@/lib/seo";
 import type { Article, NewsCategory } from "@/lib/types";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const locale = await getLocale();
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("seo");
   return pageMetadata({
     locale,
@@ -20,8 +25,11 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-export default async function NewsPage() {
-  const locale = await getLocale();
+export const revalidate = 60;
+
+export default async function NewsPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("news");
   const supabase = await createClient();
 

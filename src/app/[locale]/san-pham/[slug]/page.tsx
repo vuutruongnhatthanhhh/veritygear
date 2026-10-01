@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/public";
 import { formatVnd } from "@/lib/format";
 import { pageMetadata, absoluteUrl } from "@/lib/seo";
 import type { Product } from "@/lib/types";
@@ -12,18 +12,26 @@ import SpecsCard from "@/components/product/SpecsCard";
 import RelatedProducts from "@/components/product/RelatedProducts";
 import Newsletter from "@/components/Newsletter";
 import { ProductJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
+import { routing } from "@/i18n/routing";
 
-// Products are managed live from the admin — no generateStaticParams here,
-// every request resolves the current catalog (same as every other
-// Supabase-backed page in this app).
+// Pre-render every active product slug (both locales) at build time so
+// first-time visits are instant instead of paying a full Supabase round trip.
+// `revalidate` below still keeps them fresh, and any slug added after the
+// build (dynamicParams defaults to true) renders on first request and is
+// then cached the same way.
+export async function generateStaticParams() {
+  const supabase = await createClient();
+  const { data } = await supabase.from("products").select("slug").eq("is_active", true);
+  return routing.locales.flatMap((locale) => (data ?? []).map((p) => ({ locale, slug: p.slug })));
+}
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
-  const locale = await getLocale();
+  const { locale, slug } = await params;
+  setRequestLocale(locale);
   const supabase = await createClient();
   const { data: product } = await supabase
     .from("products")
@@ -45,13 +53,15 @@ export async function generateMetadata({
   });
 }
 
+export const revalidate = 60;
+
 export default async function ProductDetailPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }) {
-  const { slug } = await params;
-  const locale = await getLocale();
+  const { locale, slug } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("productDetail");
   const tNav = await getTranslations("nav");
   const supabase = await createClient();

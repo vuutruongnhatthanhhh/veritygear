@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import CartView from "@/components/cart/CartView";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/public";
 
 export const metadata: Metadata = {
   title: "Giỏ hàng — VERITY GEAR",
@@ -9,6 +9,8 @@ export const metadata: Metadata = {
 };
 
 const DEFAULT_FREE_SHIPPING_THRESHOLD = 1500000;
+
+export const revalidate = 60;
 
 export default async function CartPage() {
   const supabase = await createClient();

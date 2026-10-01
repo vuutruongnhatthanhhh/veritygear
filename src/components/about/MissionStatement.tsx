@@ -1,5 +1,5 @@
 import { getLocale } from "next-intl/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/public";
 
 const FALLBACK = {
   eyebrow_vi: "Sứ mệnh",

@@ -1,5 +1,5 @@
 import { getLocale } from "next-intl/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/public";
 
 const FALLBACK_ITEMS = [
   { text_vi: "Miễn phí vận chuyển toàn quốc", text_en: "Free nationwide shipping" },

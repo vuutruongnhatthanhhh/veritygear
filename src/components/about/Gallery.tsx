@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { getLocale } from "next-intl/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/public";
 
 const FALLBACK_IMAGES = [
   { image_url: "/images/products/keyboard-1.jpg", alt_vi: "Chi tiết bàn phím cơ VERITY GEAR", alt_en: "VERITY GEAR mechanical keyboard detail" },

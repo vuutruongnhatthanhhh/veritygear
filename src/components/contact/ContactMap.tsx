@@ -1,6 +1,6 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import SocialLinks from "@/components/SocialLinks";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/public";
 import { toSocialLinks } from "@/lib/socialLinks";
 
 const FALLBACK = {

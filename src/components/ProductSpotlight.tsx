@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/public";
 import { formatVnd } from "@/lib/format";
 
 export default async function ProductSpotlight() {

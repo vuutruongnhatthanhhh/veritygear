@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/public";
 import { toSocialLinks } from "@/lib/socialLinks";
 import { SITE_URL, SITE_NAME } from "@/lib/seo";
 

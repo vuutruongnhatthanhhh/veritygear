@@ -1,5 +1,5 @@
 import { getLocale, getTranslations } from "next-intl/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/public";
 
 // Icons stay hardcoded and keyed by icon_key — never render SVG markup
 // stored in the DB, to avoid an injection vector.

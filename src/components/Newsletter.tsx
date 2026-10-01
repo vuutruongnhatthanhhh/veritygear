@@ -1,5 +1,5 @@
 import { getLocale, getTranslations } from "next-intl/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/public";
 import { NewsletterForm } from "./newsletter/NewsletterForm";
 
 const FALLBACK = {

@@ -1,25 +1,31 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/public";
 import { formatArticleDate } from "@/lib/format";
 import { pageMetadata, absoluteUrl } from "@/lib/seo";
 import type { Article } from "@/lib/types";
 import NewsCard from "@/components/news/NewsCard";
 import { ArticleJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
+import { routing } from "@/i18n/routing";
 
-// Articles are managed live from the admin — no generateStaticParams here,
-// every request resolves the current catalog (same as the product detail page).
+// Pre-render every active article slug (both locales) at build time — see
+// the product detail page for why (instant first visit + revalidate keeps it fresh).
+export async function generateStaticParams() {
+  const supabase = await createClient();
+  const { data } = await supabase.from("news_articles").select("slug").eq("is_active", true);
+  return routing.locales.flatMap((locale) => (data ?? []).map((a) => ({ locale, slug: a.slug })));
+}
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
-  const locale = await getLocale();
+  const { locale, slug } = await params;
+  setRequestLocale(locale);
   const supabase = await createClient();
   const { data: article } = await supabase
     .from("news_articles")
@@ -43,13 +49,15 @@ export async function generateMetadata({
   });
 }
 
+export const revalidate = 60;
+
 export default async function ArticlePage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }) {
-  const { slug } = await params;
-  const locale = await getLocale();
+  const { locale, slug } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("news");
   const tNav = await getTranslations("nav");
   const supabase = await createClient();

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { getLocale, getTranslations } from "next-intl/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/public";
 
 const FALLBACK_TEAM = [
   { name: "Đăng Khoa", role_vi: "Nhà sáng lập & CEO", role_en: "Founder & CEO", image_url: "/images/about/team-1.jpg" },

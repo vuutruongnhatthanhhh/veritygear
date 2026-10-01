@@ -1,20 +1,26 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/public";
 import { pageMetadata } from "@/lib/seo";
+import { routing } from "@/i18n/routing";
 
-// Admin-authored static pages — no generateStaticParams, resolved live from
-// Supabase per request (same as every other admin-managed content page).
+// Pre-render every active custom page slug (both locales) at build time —
+// see the product detail page for why (instant first visit + revalidate keeps it fresh).
+export async function generateStaticParams() {
+  const supabase = await createClient();
+  const { data } = await supabase.from("custom_pages").select("slug").eq("is_active", true);
+  return routing.locales.flatMap((locale) => (data ?? []).map((p) => ({ locale, slug: p.slug })));
+}
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
-  const locale = await getLocale();
+  const { locale, slug } = await params;
+  setRequestLocale(locale);
   const supabase = await createClient();
   const { data: page } = await supabase
     .from("custom_pages")
@@ -42,13 +48,15 @@ export async function generateMetadata({
   });
 }
 
+export const revalidate = 60;
+
 export default async function CustomPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }) {
-  const { slug } = await params;
-  const locale = await getLocale();
+  const { locale, slug } = await params;
+  setRequestLocale(locale);
   const tNav = await getTranslations("nav");
   const supabase = await createClient();
   const pick = (vi: string, en: string) => (locale === "en" ? en || vi : vi);

@@ -1,5 +1,5 @@
 import { getLocale } from "next-intl/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/public";
 
 const FALLBACK_STATS = [
   { value: "2020", label_vi: "Năm thành lập", label_en: "Year founded" },

@@ -1,3 +1,4 @@
+import { setRequestLocale } from "next-intl/server";
 import Hero from "@/components/Hero";
 import Marquee from "@/components/Marquee";
 import CategoryGrid from "@/components/CategoryGrid";
@@ -8,7 +9,14 @@ import ProductSpotlight from "@/components/ProductSpotlight";
 import Testimonials from "@/components/Testimonials";
 import Newsletter from "@/components/Newsletter";
 
-export default function Home() {
+// ISR: served from cache and regenerated in the background at most once a
+// minute, instead of re-querying Supabase for every section on every visit.
+export const revalidate = 60;
+
+export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
   return (
     <>
       <Hero />

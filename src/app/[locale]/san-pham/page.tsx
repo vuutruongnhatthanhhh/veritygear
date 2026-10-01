@@ -1,15 +1,20 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import ShopHero from "@/components/shop/ShopHero";
 import ProductsGrid from "@/components/shop/ProductsGrid";
 import Newsletter from "@/components/Newsletter";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/public";
 import { pageMetadata } from "@/lib/seo";
 import type { Product, Category } from "@/lib/types";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const locale = await getLocale();
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("seo");
   return pageMetadata({
     locale,
@@ -19,8 +24,11 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-export default async function ShopPage() {
-  const locale = await getLocale();
+export const revalidate = 60;
+
+export default async function ShopPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const supabase = await createClient();
 
   const [{ data: categoryRows }, { data: productRows }] = await Promise.all([
