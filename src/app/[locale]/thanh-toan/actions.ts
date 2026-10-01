@@ -187,8 +187,12 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
       amount: total,
       description: `DH ${order.order_code}`.slice(0, 25),
       items: items.map((i) => ({ name: i.name, quantity: i.qty, price: i.price })),
-      returnUrl: `${origin}/thanh-toan/ket-qua?orderCode=${order.order_code}`,
-      cancelUrl: `${origin}/thanh-toan/ket-qua?orderCode=${order.order_code}`,
+      // Use "oc" (not "orderCode") — PayOS appends its own `orderCode` query
+      // param (its numeric code, i.e. order.id) to this URL on redirect,
+      // which would silently clobber ours (the human-readable order_code)
+      // if we used the same key name.
+      returnUrl: `${origin}/thanh-toan/ket-qua?oc=${order.order_code}`,
+      cancelUrl: `${origin}/thanh-toan/ket-qua?oc=${order.order_code}`,
     });
     return { paymentUrl: paymentLink.checkoutUrl };
   } catch (err) {

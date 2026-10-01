@@ -9,13 +9,16 @@ export const metadata = { title: "Kết quả thanh toán — VERITY GEAR", robo
 export default async function CheckoutResultPage({
   searchParams,
 }: {
-  searchParams: Promise<{ orderCode?: string; cancel?: string }>;
+  // "oc" (not "orderCode") — PayOS appends its own `orderCode` param (a
+  // different value, its numeric code) to this URL on redirect, which would
+  // collide with and overwrite a same-named param of ours.
+  searchParams: Promise<{ oc?: string; cancel?: string }>;
 }) {
-  const { orderCode, cancel } = await searchParams;
+  const { oc, cancel } = await searchParams;
   const locale = await getLocale();
   const t = await getTranslations("checkout");
 
-  if (!orderCode) notFound();
+  if (!oc) notFound();
 
   const supabase = await createClient();
   const {
@@ -23,14 +26,14 @@ export default async function CheckoutResultPage({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect({ href: `/dang-nhap?next=/thanh-toan/ket-qua?orderCode=${orderCode}`, locale });
+    redirect({ href: `/dang-nhap?next=/thanh-toan/ket-qua?oc=${oc}`, locale });
     return;
   }
 
   const { data: order } = await supabase
     .from("orders")
     .select("order_code, payment_status")
-    .eq("order_code", orderCode)
+    .eq("order_code", oc)
     .eq("user_id", user.id)
     .single();
 
@@ -62,7 +65,7 @@ export default async function CheckoutResultPage({
       <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
         {!isCancelled && (
           <Link
-            href={`/thanh-toan/ket-qua?orderCode=${order.order_code}`}
+            href={`/thanh-toan/ket-qua?oc=${order.order_code}`}
             className="inline-flex h-13 items-center bg-ink px-8 text-[13px] font-semibold uppercase tracking-[0.14em] text-paper transition-transform hover:scale-[1.02]"
           >
             {t("refresh")}
