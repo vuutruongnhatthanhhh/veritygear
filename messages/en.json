@@ -259,30 +259,30 @@
     },
     "forgotPassword": {
       "heading": "Forgot password",
-      "description": "Enter your registered email and we'll send you a password reset link.",
+      "description": "Enter your registered email and we'll send you a verification code to reset your password.",
       "emailLabel": "Email",
-      "submit": "Send reset link",
+      "submit": "Send verification code",
       "submitting": "Sending...",
-      "sentHeading": "Link sent",
-      "sentBody": "If the email exists in our system, a password reset link has been sent. Please check your inbox (and spam folder).",
       "backToLogin": "← Back to login",
       "errorRateLimited": "Too many attempts, please try again later.",
       "errorServer": "Something went wrong, please try again."
     },
     "resetPassword": {
       "heading": "Reset password",
-      "description": "Enter a new password for your account.",
+      "description": "Enter the verification code sent to your email and a new password.",
+      "descriptionWithEmail": "Enter the verification code sent to {email} and a new password.",
+      "codeLabel": "Verification code (8 digits)",
       "newPasswordLabel": "New password",
       "confirmPasswordLabel": "Confirm password",
       "submit": "Reset password",
       "submitting": "Saving...",
       "successHeading": "Password reset!",
       "successBody": "Redirecting...",
-      "checking": "Checking link...",
-      "invalidLink": "This link is invalid or has expired. Please request a new one.",
-      "requestNewLink": "Request a new link",
+      "noEmail": "No password reset request found.",
+      "requestNewCode": "Request a new code",
       "errorMismatch": "Passwords do not match",
-      "errorTooShort": "Password must be at least 6 characters"
+      "errorTooShort": "Password must be at least 6 characters",
+      "errorInvalidCode": "Invalid or expired verification code."
     }
   }
 }

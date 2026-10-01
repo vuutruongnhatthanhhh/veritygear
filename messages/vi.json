@@ -259,30 +259,30 @@
     },
     "forgotPassword": {
       "heading": "Quên mật khẩu",
-      "description": "Nhập email đã đăng ký, chúng tôi sẽ gửi liên kết đặt lại mật khẩu.",
+      "description": "Nhập email đã đăng ký, chúng tôi sẽ gửi mã xác nhận để đặt lại mật khẩu.",
       "emailLabel": "Email",
-      "submit": "Gửi liên kết đặt lại",
+      "submit": "Gửi mã xác nhận",
       "submitting": "Đang gửi...",
-      "sentHeading": "Đã gửi liên kết",
-      "sentBody": "Nếu email tồn tại trong hệ thống, một liên kết đặt lại mật khẩu đã được gửi. Vui lòng kiểm tra hộp thư đến (và cả thư mục Spam).",
       "backToLogin": "← Quay lại đăng nhập",
       "errorRateLimited": "Bạn đã thử quá nhiều lần, vui lòng thử lại sau.",
       "errorServer": "Có lỗi xảy ra, vui lòng thử lại."
     },
     "resetPassword": {
       "heading": "Đặt lại mật khẩu",
-      "description": "Nhập mật khẩu mới cho tài khoản của bạn.",
+      "description": "Nhập mã xác nhận đã gửi tới email của bạn và mật khẩu mới.",
+      "descriptionWithEmail": "Nhập mã xác nhận đã gửi tới {email} và mật khẩu mới.",
+      "codeLabel": "Mã xác nhận (8 số)",
       "newPasswordLabel": "Mật khẩu mới",
       "confirmPasswordLabel": "Xác nhận mật khẩu",
       "submit": "Đặt lại mật khẩu",
       "submitting": "Đang lưu...",
       "successHeading": "Đã đặt lại mật khẩu!",
       "successBody": "Đang chuyển hướng...",
-      "checking": "Đang kiểm tra liên kết...",
-      "invalidLink": "Liên kết không hợp lệ hoặc đã hết hạn. Vui lòng yêu cầu liên kết mới.",
-      "requestNewLink": "Yêu cầu liên kết mới",
+      "noEmail": "Không tìm thấy yêu cầu đặt lại mật khẩu.",
+      "requestNewCode": "Yêu cầu mã mới",
       "errorMismatch": "Mật khẩu xác nhận không khớp",
-      "errorTooShort": "Mật khẩu phải có ít nhất 6 ký tự"
+      "errorTooShort": "Mật khẩu phải có ít nhất 6 ký tự",
+      "errorInvalidCode": "Mã xác nhận không đúng hoặc đã hết hạn."
     }
   }
 }
