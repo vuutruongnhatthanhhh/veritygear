@@ -36,32 +36,31 @@ export default async function CheckoutResultPage({
 
   if (!order) notFound();
 
-  const isPaid = order.payment_status === "paid";
+  if (order.payment_status === "paid") {
+    redirect({ href: "/tai-khoan/don-hang", locale });
+    return;
+  }
+
   const isCancelled = order.payment_status === "cancelled" || cancel === "true";
 
   return (
     <div className="mx-auto flex max-w-[1600px] flex-col items-center px-6 py-32 text-center sm:px-10">
       <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.35em] text-ink/40">
-        {isPaid ? t("successEyebrow") : isCancelled ? t("resultCancelledEyebrow") : t("resultPendingEyebrow")}
+        {isCancelled ? t("resultCancelledEyebrow") : t("resultPendingEyebrow")}
       </p>
       <h1 className="font-display text-3xl font-bold uppercase leading-[1.05] sm:text-4xl">
-        {isPaid ? t("successHeading") : isCancelled ? t("resultCancelledHeading") : t("resultPendingHeading")}
+        {isCancelled ? t("resultCancelledHeading") : t("resultPendingHeading")}
       </h1>
       <p className="mt-4 max-w-md text-[15px] leading-relaxed text-ink/60">
-        {isPaid
-          ? t.rich("successBody", {
+        {isCancelled
+          ? t("resultCancelledBody")
+          : t.rich("resultPendingBody", {
               orderCode: order.order_code,
               code: (chunks) => <span className="font-semibold text-ink">{chunks}</span>,
-            })
-          : isCancelled
-            ? t("resultCancelledBody")
-            : t.rich("resultPendingBody", {
-                orderCode: order.order_code,
-                code: (chunks) => <span className="font-semibold text-ink">{chunks}</span>,
-              })}
+            })}
       </p>
       <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-        {!isPaid && !isCancelled && (
+        {!isCancelled && (
           <Link
             href={`/thanh-toan/ket-qua?orderCode=${order.order_code}`}
             className="inline-flex h-13 items-center bg-ink px-8 text-[13px] font-semibold uppercase tracking-[0.14em] text-paper transition-transform hover:scale-[1.02]"
