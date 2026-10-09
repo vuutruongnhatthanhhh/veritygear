@@ -1,11 +1,30 @@
 import Image from "next/image";
+import { getLocale } from "next-intl/server";
+import { createClient } from "@/lib/supabase/public";
 
-export default function ShopHero() {
+const FALLBACK = {
+  eyebrow_vi: "Cửa hàng",
+  eyebrow_en: "Shop",
+  heading_line1_vi: "Toàn bộ",
+  heading_line2_vi: "bộ sưu tập",
+  heading_line1_en: "The entire",
+  heading_line2_en: "collection",
+  image_url: "/images/products/keyboard-2.jpg",
+};
+
+export default async function ShopHero() {
+  const locale = await getLocale();
+  const supabase = await createClient();
+  const { data } = await supabase.from("shop_hero").select("*").eq("id", 1).single();
+  const hero = { ...FALLBACK, ...data };
+
+  const pick = (vi: string, en: string) => (locale === "en" ? en || vi : vi);
+
   return (
     <section className="relative flex h-[50svh] min-h-[380px] w-full items-end overflow-hidden bg-ink">
       <Image
-        src="/images/products/keyboard-2.jpg"
-        alt="Toàn bộ sản phẩm VERITY GEAR"
+        src={hero.image_url || FALLBACK.image_url}
+        alt={pick(hero.heading_line1_vi, hero.heading_line1_en)}
         fill
         priority
         sizes="100vw"
@@ -15,12 +34,12 @@ export default function ShopHero() {
 
       <div className="relative z-10 mx-auto w-full max-w-[1600px] px-6 pb-14 pt-32 sm:px-10">
         <p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.35em] text-paper/60">
-          Cửa hàng
+          {pick(hero.eyebrow_vi, hero.eyebrow_en)}
         </p>
         <h1 className="max-w-2xl font-display text-5xl font-bold uppercase leading-[1.28] text-paper sm:text-7xl">
-          Toàn bộ
+          {pick(hero.heading_line1_vi, hero.heading_line1_en)}
           <br />
-          bộ sưu tập
+          {pick(hero.heading_line2_vi, hero.heading_line2_en)}
         </h1>
       </div>
     </section>

@@ -6,13 +6,9 @@ const ICONS: Record<SocialPlatform, { label: string; path: React.ReactNode }> = 
     path: <path d="M13.5 21v-7.5h2.52l.38-3H13.5l.004-1.5c0-.78.075-1.2 1.2-1.2h1.68V4.8h-2.52c-2.4 0-3.24 1.212-3.24 3.249V10.5H9v3h1.62V21h2.88Z" />,
   },
   instagram: {
-    label: "Instagram",
+    label: "X",
     path: (
-      <>
-        <rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" strokeWidth="1.6" />
-        <circle cx="12" cy="12" r="3.6" fill="none" stroke="currentColor" strokeWidth="1.6" />
-        <circle cx="17.4" cy="6.6" r="1.1" />
-      </>
+      <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z" />
     ),
   },
   tiktok: {

@@ -23,7 +23,7 @@ export default async function MissionStatement() {
       <p className="mb-6 text-[11px] font-semibold uppercase tracking-[0.35em] text-ink">
         {pick(mission.eyebrow_vi, mission.eyebrow_en)}
       </p>
-      <p className="font-display text-2xl font-medium leading-snug tracking-tight sm:text-4xl">
+      <p className="text-[16px] font-bold leading-snug sm:text-[20px]">
         {pick(mission.body_vi, mission.body_en)}
       </p>
     </section>
