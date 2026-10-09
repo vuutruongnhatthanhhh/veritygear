@@ -67,11 +67,19 @@ export default async function ProductDetailPage({
   const supabase = await createClient();
   const pick = (vi: string, en: string) => (locale === "en" ? en || vi : vi);
 
-  const FEATURES = [
-    { label: t("warrantyLabel"), desc: t("warrantyDesc") },
-    { label: t("returnLabel"), desc: t("returnDesc") },
-    { label: t("shippingLabel"), desc: t("shippingDesc") },
-  ];
+  const { data: guarantees } = await supabase.from("product_guarantees").select("*").eq("id", 1).single();
+
+  const FEATURES = guarantees
+    ? [
+        { label: pick(guarantees.warranty_label_vi, guarantees.warranty_label_en), desc: pick(guarantees.warranty_desc_vi, guarantees.warranty_desc_en) },
+        { label: pick(guarantees.return_label_vi, guarantees.return_label_en), desc: pick(guarantees.return_desc_vi, guarantees.return_desc_en) },
+        { label: pick(guarantees.shipping_label_vi, guarantees.shipping_label_en), desc: pick(guarantees.shipping_desc_vi, guarantees.shipping_desc_en) },
+      ]
+    : [
+        { label: t("warrantyLabel"), desc: t("warrantyDesc") },
+        { label: t("returnLabel"), desc: t("returnDesc") },
+        { label: t("shippingLabel"), desc: t("shippingDesc") },
+      ];
 
   const { data: row } = await supabase
     .from("products")

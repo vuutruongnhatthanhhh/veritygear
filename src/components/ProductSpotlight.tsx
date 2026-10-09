@@ -42,7 +42,7 @@ export default async function ProductSpotlight() {
   return (
     <section className="relative flex min-h-[85vh] items-center overflow-hidden bg-ink">
       <Image
-        src="/images/about/setup-2.jpg"
+        src={content?.image_url || "/images/about/setup-2.jpg"}
         alt={hero.name}
         fill
         sizes="100vw"
