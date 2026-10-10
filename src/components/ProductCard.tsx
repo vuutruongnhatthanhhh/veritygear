@@ -40,11 +40,12 @@ export default function ProductCard({ product }: { product: Product }) {
         <button
           type="button"
           onClick={handleAdd}
-          className={`absolute inset-x-3 bottom-3 z-10 bg-paper py-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 ${
-            added ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
+          disabled={product.isOutOfStock}
+          className={`absolute inset-x-3 bottom-3 z-10 bg-paper py-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-ink transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 disabled:cursor-not-allowed disabled:bg-paper/60 ${
+            added || product.isOutOfStock ? "translate-y-0 opacity-100" : "translate-y-12 opacity-0"
           }`}
         >
-          {added ? t("added") : t("add")}
+          {product.isOutOfStock ? t("outOfStock") : added ? t("added") : t("add")}
         </button>
       </div>
       <Link href={href} className="mt-4 flex items-start justify-between gap-2">

@@ -89,6 +89,7 @@
   "productCard": {
     "add": "Thêm vào giỏ",
     "added": "Đã thêm vào giỏ ✓",
+    "outOfStock": "Hết hàng",
     "decreaseQty": "Giảm số lượng",
     "increaseQty": "Tăng số lượng"
   },

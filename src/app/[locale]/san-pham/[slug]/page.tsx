@@ -107,6 +107,7 @@ export default async function ProductDetailPage({
     badge: pick(row.badge_vi ?? "", row.badge_en ?? "") || undefined,
     description: pick(row.description_vi, row.description_en),
     specs: (specRows ?? []).map((s) => ({ label: pick(s.label_vi, s.label_en), value: pick(s.value_vi, s.value_en) })),
+    isOutOfStock: row.is_out_of_stock,
   };
 
   let related: Product[] = [];
@@ -131,6 +132,7 @@ export default async function ProductDetailPage({
       badge: pick(p.badge_vi ?? "", p.badge_en ?? "") || undefined,
       description: pick(p.description_vi, p.description_en),
       specs: [],
+      isOutOfStock: p.is_out_of_stock,
     }));
   }
 

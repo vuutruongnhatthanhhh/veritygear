@@ -18,6 +18,7 @@ export type Product = {
   badge?: string;
   description: string;
   specs: { label: string; value: string }[];
+  isOutOfStock?: boolean;
 };
 
 export type Category = {

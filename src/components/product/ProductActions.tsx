@@ -44,9 +44,10 @@ export default function ProductActions({ product }: { product: Product }) {
       <button
         type="button"
         onClick={handleAdd}
-        className="h-13 flex-1 min-w-[180px] bg-ink px-8 text-[13px] font-semibold uppercase tracking-[0.14em] text-paper transition-transform hover:scale-[1.02]"
+        disabled={product.isOutOfStock}
+        className="h-13 flex-1 min-w-[180px] bg-ink px-8 text-[13px] font-semibold uppercase tracking-[0.14em] text-paper transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:bg-ink/30 disabled:hover:scale-100"
       >
-        {added ? t("added") : t("add")}
+        {product.isOutOfStock ? t("outOfStock") : added ? t("added") : t("add")}
       </button>
     </div>
   );
