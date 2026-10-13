@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Inter, Space_Grotesk } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ScrollToTopButton from "@/components/ScrollToTopButton";
@@ -11,19 +10,6 @@ import { OrganizationJsonLd } from "@/components/seo/JsonLd";
 import { createClient } from "@/lib/supabase/public";
 import { SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE, absoluteUrl } from "@/lib/seo";
 import { routing } from "@/i18n/routing";
-import "../globals.css";
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin", "vietnamese"],
-  display: "swap",
-});
-
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
-  subsets: ["latin", "vietnamese"],
-  display: "swap",
-});
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -108,21 +94,16 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
 
   return (
-    <html
-      lang={locale}
-      className={`${inter.variable} ${spaceGrotesk.variable} h-full antialiased`}
-    >
-      <body className="flex min-h-full flex-col bg-paper text-ink font-sans">
-        <OrganizationJsonLd />
-        <NextIntlClientProvider>
-          <CartProvider>
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-            <ScrollToTopButton />
-          </CartProvider>
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <>
+      <OrganizationJsonLd />
+      <NextIntlClientProvider>
+        <CartProvider>
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
+          <ScrollToTopButton />
+        </CartProvider>
+      </NextIntlClientProvider>
+    </>
   );
 }
