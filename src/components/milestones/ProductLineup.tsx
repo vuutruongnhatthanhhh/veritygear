@@ -13,27 +13,33 @@ type LineupRow = {
 export default async function ProductLineup() {
   const locale = await getLocale();
   const supabase = await createClient();
-  const { data: lineup } = await supabase
-    .from("products")
-    .select("slug, name, image_url, category_id, product_categories(name_vi, name_en)")
-    .eq("is_active", true)
-    .eq("is_lineup", true)
-    .order("sort_order")
-    .limit(4)
-    .returns<LineupRow[]>();
+  const [{ data: content }, { data: lineup }] = await Promise.all([
+    supabase.from("milestones_lineup").select("*").eq("id", 1).single(),
+    supabase
+      .from("products")
+      .select("slug, name, image_url, category_id, product_categories(name_vi, name_en)")
+      .eq("is_active", true)
+      .eq("is_lineup", true)
+      .order("sort_order")
+      .limit(4)
+      .returns<LineupRow[]>(),
+  ]);
 
   const pick = (vi: string, en: string) => (locale === "en" ? en || vi : vi);
 
   if (!lineup || lineup.length === 0) return null;
 
+  const eyebrow = content ? pick(content.eyebrow_vi, content.eyebrow_en) : "Sản phẩm mới";
+  const heading = content ? pick(content.heading_vi, content.heading_en) : "Lineup mới nhất của VERITY GEAR";
+
   return (
     <section className="mx-auto max-w-[1600px] px-6 py-24 sm:px-10 sm:py-32">
       <div className="mb-14 text-center">
         <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.35em] text-ink">
-          Sản phẩm mới
+          {eyebrow}
         </p>
         <h2 className="mx-auto max-w-2xl font-display text-4xl font-bold uppercase leading-[1.05] sm:text-5xl">
-          Lineup mới nhất của VERITY GEAR
+          {heading}
         </h2>
       </div>
 
