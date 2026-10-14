@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { toEnglishPath } from "./localizedPaths";
 
 // Canonical base URL of the deployed site (no trailing slash). Falls back to
 // localhost so local dev still produces valid absolute URLs.
@@ -9,12 +10,16 @@ export const SITE_NAME = "VERITY GEAR";
 // Default social-share image when a page has none of its own.
 export const DEFAULT_OG_IMAGE = "/images/hero/hero-main.jpg";
 
-// Maps a locale-agnostic path (always starting with "/", or "/" for home) to
-// the real on-site path: vi is unprefixed, en is prefixed with /en — matching
-// routing.localePrefix "as-needed".
+// Maps a canonical (Vietnamese) path (always starting with "/", or "/" for
+// home) to the real on-site path: vi keeps the same path unprefixed, en gets
+// its own translated path (see src/lib/localizedPaths.ts) prefixed with /en
+// — matching routing.localePrefix "as-needed".
 export function localizedPath(locale: string, path: string): string {
   const clean = path === "/" ? "" : path;
-  return locale === "en" ? `/en${clean}` : clean || "/";
+  if (locale === "en") {
+    return `/en${clean ? toEnglishPath(clean) : ""}`;
+  }
+  return clean || "/";
 }
 
 export function absoluteUrl(locale: string, path: string): string {

@@ -1,6 +1,6 @@
 import Image from "next/image";
+import Link from "next/link";
 import { getLocale } from "next-intl/server";
-import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/public";
 import { formatVnd } from "@/lib/format";
 

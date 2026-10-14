@@ -4,6 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { formatVnd } from "@/lib/format";
 import type { OrderStatus } from "@/lib/types";
+import { localizedPath } from "@/lib/seo";
 
 export const metadata = { title: "Đơn hàng của tôi — VERITY GEAR", robots: { index: false, follow: false } };
 
@@ -18,7 +19,8 @@ export default async function OrderHistoryPage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect({ href: "/dang-nhap?next=/tai-khoan/don-hang", locale });
+    const next = localizedPath(locale, "/tai-khoan/don-hang");
+    redirect({ href: { pathname: "/dang-nhap", query: { next } }, locale });
     return;
   }
 
@@ -52,7 +54,7 @@ export default async function OrderHistoryPage() {
           {orders.map((o) => (
             <Link
               key={o.order_code}
-              href={`/tai-khoan/don-hang/${o.order_code}`}
+              href={{ pathname: "/tai-khoan/don-hang/[code]", params: { code: o.order_code } }}
               className="flex flex-wrap items-center justify-between gap-4 px-5 py-4 transition-colors hover:bg-ink/[0.03]"
             >
               <div>

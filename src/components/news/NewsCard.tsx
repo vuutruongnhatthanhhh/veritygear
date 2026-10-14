@@ -9,7 +9,7 @@ export default function NewsCard({ article }: { article: Article }) {
   const t = useTranslations("news");
 
   return (
-    <Link href={`/tin-tuc/${article.slug}`} className="group flex flex-col">
+    <Link href={{ pathname: "/tin-tuc/[slug]", params: { slug: article.slug } }} className="group flex flex-col">
       <div className="relative aspect-[4/3] overflow-hidden bg-ink/5">
         <Image
           src={article.image}

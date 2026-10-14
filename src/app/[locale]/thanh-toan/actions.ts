@@ -1,11 +1,13 @@
 "use server";
 
 import { headers } from "next/headers";
+import { getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { ghnCalculateFee } from "@/lib/ghn";
 import { getPayOS } from "@/lib/payos";
 import { sendNewOrderNotification } from "@/lib/orderNotification";
+import { localizedPath } from "@/lib/seo";
 
 export type CheckoutState = { error?: string; orderCode?: string; paymentUrl?: string } | null;
 
@@ -182,6 +184,8 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
   // the same as confirmed ones.
   try {
     const origin = await siteOrigin();
+    const locale = await getLocale();
+    const resultPath = `${localizedPath(locale, "/thanh-toan/ket-qua")}?oc=${order.order_code}`;
     const paymentLink = await getPayOS().paymentRequests.create({
       orderCode: order.id,
       amount: total,
@@ -191,8 +195,8 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
       // param (its numeric code, i.e. order.id) to this URL on redirect,
       // which would silently clobber ours (the human-readable order_code)
       // if we used the same key name.
-      returnUrl: `${origin}/thanh-toan/ket-qua?oc=${order.order_code}`,
-      cancelUrl: `${origin}/thanh-toan/ket-qua?oc=${order.order_code}`,
+      returnUrl: `${origin}${resultPath}`,
+      cancelUrl: `${origin}${resultPath}`,
     });
     return { paymentUrl: paymentLink.checkoutUrl };
   } catch (err) {

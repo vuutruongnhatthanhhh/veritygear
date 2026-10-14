@@ -47,7 +47,7 @@ export default async function ProductLineup() {
         {lineup.map((product) => (
           <Link
             key={product.slug}
-            href={`/san-pham/${product.slug}`}
+            href={{ pathname: "/san-pham/[slug]", params: { slug: product.slug } }}
             className="group relative overflow-hidden bg-ink"
           >
             <div className="relative aspect-3/4 w-full">

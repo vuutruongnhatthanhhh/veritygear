@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import type { Product } from "@/lib/types";
-import { useCart } from "@/components/providers/CartProvider";
+import { useCart, MAX_QTY_PER_PRODUCT } from "@/components/providers/CartProvider";
 
 export default function ProductActions({ product }: { product: Product }) {
   const t = useTranslations("productCard");
@@ -33,9 +33,10 @@ export default function ProductActions({ product }: { product: Product }) {
         </span>
         <button
           type="button"
-          onClick={() => setQty((q) => q + 1)}
+          onClick={() => setQty((q) => Math.min(MAX_QTY_PER_PRODUCT, q + 1))}
+          disabled={qty >= MAX_QTY_PER_PRODUCT}
           aria-label={t("increaseQty")}
-          className="flex h-full w-11 items-center justify-center text-ink/60 transition-colors hover:text-ink"
+          className="flex h-full w-11 items-center justify-center text-ink/60 transition-colors hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
         >
           +
         </button>

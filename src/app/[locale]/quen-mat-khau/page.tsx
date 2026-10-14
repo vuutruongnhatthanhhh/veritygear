@@ -32,7 +32,7 @@ export default function QuenMatKhauPage() {
         setError(t("errorRateLimited"));
         setSubmitting(false);
       } else {
-        router.push(`/dat-lai-mat-khau?email=${encodeURIComponent(email)}`);
+        router.push({ pathname: "/dat-lai-mat-khau", query: { email } });
       }
     } catch {
       setError(t("errorServer"));

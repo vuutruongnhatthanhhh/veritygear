@@ -9,6 +9,7 @@ import {
 } from "react";
 
 const STORAGE_KEY = "veritygear-cart";
+export const MAX_QTY_PER_PRODUCT = 10;
 
 export type CartItem = {
   slug: string;
@@ -60,9 +61,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems((prev) => {
       const existing = prev.find((l) => l.slug === product.slug);
       if (existing) {
-        return prev.map((l) => (l.slug === product.slug ? { ...l, qty: l.qty + qty } : l));
+        return prev.map((l) =>
+          l.slug === product.slug ? { ...l, qty: Math.min(l.qty + qty, MAX_QTY_PER_PRODUCT) } : l,
+        );
       }
-      return [...prev, { ...product, qty }];
+      return [...prev, { ...product, qty: Math.min(qty, MAX_QTY_PER_PRODUCT) }];
     });
   }
 
@@ -75,7 +78,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       removeItem(slug);
       return;
     }
-    setItems((prev) => prev.map((l) => (l.slug === slug ? { ...l, qty } : l)));
+    const clamped = Math.min(qty, MAX_QTY_PER_PRODUCT);
+    setItems((prev) => prev.map((l) => (l.slug === slug ? { ...l, qty: clamped } : l)));
   }
 
   function clear() {

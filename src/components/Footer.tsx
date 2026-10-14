@@ -1,4 +1,5 @@
 import Image from "next/image";
+import type { ComponentProps } from "react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import SocialLinks from "./SocialLinks";
@@ -24,12 +25,15 @@ export default async function Footer() {
   const socialLinks = toSocialLinks(socialRow);
   const tagline = footerRow ? pick(footerRow.tagline_vi, footerRow.tagline_en) : "";
 
-  const columns = [
+  type FooterHref = ComponentProps<typeof Link>["href"];
+  type FooterLink = { label: string; href: FooterHref };
+
+  const columns: { title: string; links: FooterLink[] }[] = [
     {
       title: t("footer.productsTitle"),
       links: (categoryRows ?? []).map((c) => ({
         label: pick(c.name_vi, c.name_en),
-        href: `/san-pham?danh-muc=${c.slug}`,
+        href: { pathname: "/san-pham", query: { "danh-muc": c.slug } },
       })),
     },
     {
@@ -40,7 +44,7 @@ export default async function Footer() {
         { label: t("nav.tinTuc"), href: "/tin-tuc" },
         ...(customPageRows ?? []).map((p) => ({
           label: pick(p.title_vi, p.title_en),
-          href: `/${p.slug}`,
+          href: { pathname: "/[slug]", params: { slug: p.slug } } as FooterHref,
         })),
       ],
     },

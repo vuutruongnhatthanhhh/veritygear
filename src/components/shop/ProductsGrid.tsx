@@ -34,8 +34,11 @@ export default function ProductsGrid({
   }, [products, active]);
 
   function handleFilter(slug: string) {
-    const url = slug === "tat-ca" ? "/san-pham" : `/san-pham?danh-muc=${slug}`;
-    router.replace(url, { scroll: false });
+    if (slug === "tat-ca") {
+      router.replace("/san-pham", { scroll: false });
+    } else {
+      router.replace({ pathname: "/san-pham", query: { "danh-muc": slug } }, { scroll: false });
+    }
   }
 
   return (

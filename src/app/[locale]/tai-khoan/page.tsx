@@ -3,6 +3,7 @@ import { redirect } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AccountForm } from "./account-form";
+import { localizedPath } from "@/lib/seo";
 
 export const metadata = { title: "Tài khoản — VERITY GEAR", robots: { index: false, follow: false } };
 
@@ -15,7 +16,8 @@ export default async function TaiKhoanPage() {
 
   if (!user) {
     const locale = await getLocale();
-    redirect({ href: "/dang-nhap?next=/tai-khoan", locale });
+    const next = localizedPath(locale, "/tai-khoan");
+    redirect({ href: { pathname: "/dang-nhap", query: { next } }, locale });
     return;
   }
 

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { useCart } from "@/components/providers/CartProvider";
+import { useCart, MAX_QTY_PER_PRODUCT } from "@/components/providers/CartProvider";
 import { formatVnd } from "@/lib/format";
 
 export default function CartView({ freeShippingThreshold }: { freeShippingThreshold: number }) {
@@ -51,7 +51,7 @@ export default function CartView({ freeShippingThreshold }: { freeShippingThresh
             {items.map((item) => (
               <div key={item.slug} className="flex gap-5 py-6 first:pt-0">
                 <Link
-                  href={`/san-pham/${item.slug}`}
+                  href={{ pathname: "/san-pham/[slug]", params: { slug: item.slug } }}
                   className="relative h-28 w-24 shrink-0 overflow-hidden bg-ink/5 sm:h-32 sm:w-28"
                 >
                   <Image
@@ -66,7 +66,7 @@ export default function CartView({ freeShippingThreshold }: { freeShippingThresh
                 <div className="flex flex-1 flex-col justify-between">
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <Link href={`/san-pham/${item.slug}`}>
+                      <Link href={{ pathname: "/san-pham/[slug]", params: { slug: item.slug } }}>
                         <h3 className="font-display text-base font-bold uppercase tracking-wide transition-colors hover:text-ink/70">
                           {item.name}
                         </h3>
@@ -101,8 +101,9 @@ export default function CartView({ freeShippingThreshold }: { freeShippingThresh
                       <button
                         type="button"
                         onClick={() => setQty(item.slug, item.qty + 1)}
+                        disabled={item.qty >= MAX_QTY_PER_PRODUCT}
                         aria-label={t("increaseAria")}
-                        className="flex h-full w-9 items-center justify-center text-ink/60 transition-colors hover:text-ink"
+                        className="flex h-full w-9 items-center justify-center text-ink/60 transition-colors hover:text-ink disabled:cursor-not-allowed disabled:opacity-30"
                       >
                         +
                       </button>

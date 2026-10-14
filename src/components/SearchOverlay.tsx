@@ -162,7 +162,7 @@ export default function SearchOverlay({
                 {results.map((product) => (
                   <li key={product.slug}>
                     <Link
-                      href={`/san-pham/${product.slug}`}
+                      href={{ pathname: "/san-pham/[slug]", params: { slug: product.slug } }}
                       onClick={onClose}
                       className="flex items-center gap-4 py-4"
                     >

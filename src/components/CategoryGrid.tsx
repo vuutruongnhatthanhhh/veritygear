@@ -55,7 +55,7 @@ export default async function CategoryGrid() {
         {categories.map((cat, i) => (
           <Link
             key={cat.slug}
-            href={`/san-pham?danh-muc=${cat.slug}`}
+            href={{ pathname: "/san-pham", query: { "danh-muc": cat.slug } }}
             className={`group relative flex flex-col justify-end overflow-hidden bg-ink ${
               i === 0
                 ? "col-span-2 aspect-16/10 md:col-span-2 md:row-span-2 md:aspect-auto"

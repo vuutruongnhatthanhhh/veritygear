@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import createIntlMiddleware from "next-intl/middleware";
 import { routing } from "@/i18n/routing";
 import { createClient as createPublicClient } from "@/lib/supabase/public";
+import { toCanonicalPath, toEnglishPath } from "@/lib/localizedPaths";
 
 const intlMiddleware = createIntlMiddleware(routing);
 
@@ -59,9 +60,14 @@ export async function proxy(request: NextRequest) {
     });
   }
 
+  // `request.nextUrl.pathname` is the real public URL (e.g. "/en/account"),
+  // which differs from the canonical "/tai-khoan" route name since English
+  // pages now have their own translated path — normalize back to canonical
+  // before the prefix check below.
   const pathWithoutLocale =
     request.nextUrl.pathname.replace(/^\/(vi|en)(?=\/|$)/, "") || "/";
-  if (!pathWithoutLocale.startsWith("/tai-khoan")) return response;
+  const canonicalPath = toCanonicalPath(pathWithoutLocale);
+  if (!canonicalPath.startsWith("/tai-khoan")) return response;
 
   const locale = request.nextUrl.pathname.startsWith("/en") ? "en" : "vi";
   const localePrefix = locale === routing.defaultLocale ? "" : `/${locale}`;
@@ -88,7 +94,8 @@ export async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    const url = new URL(`${localePrefix}/dang-nhap`, request.url);
+    const loginPath = locale === "en" ? toEnglishPath("/dang-nhap") : "/dang-nhap";
+    const url = new URL(`${localePrefix}${loginPath}`, request.url);
     url.searchParams.set("next", request.nextUrl.pathname);
     return NextResponse.redirect(url);
   }

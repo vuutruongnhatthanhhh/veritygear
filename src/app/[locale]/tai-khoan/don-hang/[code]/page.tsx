@@ -5,6 +5,7 @@ import { redirect } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { formatVnd } from "@/lib/format";
+import { localizedPath } from "@/lib/seo";
 import type { OrderStatus } from "@/lib/types";
 
 export const metadata = { title: "Chi tiết đơn hàng — VERITY GEAR", robots: { index: false, follow: false } };
@@ -21,7 +22,8 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ co
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect({ href: `/dang-nhap?next=/tai-khoan/don-hang/${code}`, locale });
+    const next = localizedPath(locale, `/tai-khoan/don-hang/${code}`);
+    redirect({ href: { pathname: "/dang-nhap", query: { next } }, locale });
     return;
   }
 

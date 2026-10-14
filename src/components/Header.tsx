@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useParams } from "next/navigation";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
@@ -37,6 +38,7 @@ const HERO_ROUTES = new Set([
 
 export default function Header() {
   const pathname = usePathname();
+  const params = useParams();
   const hasHero = HERO_ROUTES.has(pathname);
   const { itemCount } = useCart();
   const locale = useLocale();
@@ -79,7 +81,14 @@ export default function Header() {
   }, [open]);
 
   function switchLocale(nextLocale: "vi" | "en") {
-    router.replace(pathname, { locale: nextLocale });
+    // `pathname` is typed as the union of every possible canonical route,
+    // including dynamic ones ("/san-pham/[slug]") — TypeScript can't verify
+    // the `params` (from the current URL) actually match whichever one
+    // `pathname` resolves to at runtime, so this exact pattern needs the
+    // escape hatch next-intl's own docs use for pathname-aware locale
+    // switchers.
+    // @ts-expect-error -- see comment above
+    router.replace({ pathname, params }, { locale: nextLocale });
   }
 
   const solid = !hasHero || scrolled || open;

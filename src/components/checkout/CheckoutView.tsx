@@ -103,7 +103,7 @@ export default function CheckoutView({
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
           <Link
-            href={`/tai-khoan/don-hang/${state.orderCode}`}
+            href={{ pathname: "/tai-khoan/don-hang/[code]", params: { code: state.orderCode } }}
             className="inline-flex h-13 items-center bg-ink px-8 text-[13px] font-semibold uppercase tracking-[0.14em] text-paper transition-transform hover:scale-[1.02]"
           >
             {t("viewOrder")}

@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Link, useRouter } from "@/i18n/navigation";
+import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 const inputClass =
@@ -12,6 +12,10 @@ const inputClass =
 export function LoginForm() {
   const t = useTranslations("auth.login");
   const tAccount = useTranslations("account");
+  // Plain (non-i18n) router: `next` already arrives as a fully-resolved,
+  // locale-prefixed public path (built via localizedPath() wherever this
+  // page was linked from) — pushing it through next-intl's typed router
+  // would try to re-translate it as if it were a canonical pathname.
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "/";

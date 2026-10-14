@@ -32,8 +32,11 @@ export default function NewsGrid({
   }, [articles, active]);
 
   function handleFilter(slug: string) {
-    const url = slug === "tat-ca" ? "/tin-tuc" : `/tin-tuc?chu-de=${slug}`;
-    router.replace(url, { scroll: false });
+    if (slug === "tat-ca") {
+      router.replace("/tin-tuc", { scroll: false });
+    } else {
+      router.replace({ pathname: "/tin-tuc", query: { "chu-de": slug } }, { scroll: false });
+    }
   }
 
   return (

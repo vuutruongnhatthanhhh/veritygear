@@ -10,7 +10,7 @@ import { useCart } from "@/components/providers/CartProvider";
 
 export default function ProductCard({ product }: { product: Product }) {
   const t = useTranslations("productCard");
-  const href = `/san-pham/${product.slug}`;
+  const href = { pathname: "/san-pham/[slug]", params: { slug: product.slug } } as const;
   const { addItem } = useCart();
   const [added, setAdded] = useState(false);
 

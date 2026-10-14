@@ -3,6 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { localizedPath } from "@/lib/seo";
 
 export const metadata = { title: "Kết quả thanh toán — VERITY GEAR", robots: { index: false, follow: false } };
 
@@ -26,7 +27,8 @@ export default async function CheckoutResultPage({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect({ href: `/dang-nhap?next=/thanh-toan/ket-qua?oc=${oc}`, locale });
+    const next = `${localizedPath(locale, "/thanh-toan/ket-qua")}?oc=${oc}`;
+    redirect({ href: { pathname: "/dang-nhap", query: { next } }, locale });
     return;
   }
 
@@ -65,14 +67,14 @@ export default async function CheckoutResultPage({
       <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
         {!isCancelled && (
           <Link
-            href={`/thanh-toan/ket-qua?oc=${order.order_code}`}
+            href={{ pathname: "/thanh-toan/ket-qua", query: { oc: order.order_code } }}
             className="inline-flex h-13 items-center bg-ink px-8 text-[13px] font-semibold uppercase tracking-[0.14em] text-paper transition-transform hover:scale-[1.02]"
           >
             {t("refresh")}
           </Link>
         )}
         <Link
-          href={`/tai-khoan/don-hang/${order.order_code}`}
+          href={{ pathname: "/tai-khoan/don-hang/[code]", params: { code: order.order_code } }}
           className="inline-flex h-13 items-center border border-ink/20 px-8 text-[13px] font-semibold uppercase tracking-[0.14em] text-ink transition-colors hover:border-ink"
         >
           {t("viewOrder")}

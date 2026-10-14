@@ -4,6 +4,7 @@ import { redirect } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import CheckoutView from "@/components/checkout/CheckoutView";
+import { localizedPath } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Thanh toán — VERITY GEAR",
@@ -23,7 +24,8 @@ export default async function CheckoutPage() {
 
   if (!user) {
     const locale = await getLocale();
-    redirect({ href: "/dang-nhap?next=/thanh-toan", locale });
+    const next = localizedPath(locale, "/thanh-toan");
+    redirect({ href: { pathname: "/dang-nhap", query: { next } }, locale });
     return;
   }
 
