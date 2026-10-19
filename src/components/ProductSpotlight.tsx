@@ -2,10 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/public";
-import { formatVnd } from "@/lib/format";
+import { formatPrice } from "@/lib/format";
+import { getExchangeRate } from "@/lib/exchangeRate";
 
 export default async function ProductSpotlight() {
   const locale = await getLocale();
+  const rate = await getExchangeRate();
   const supabase = await createClient();
 
   const [{ data: content }, { data: spotlightRow }] = await Promise.all([
@@ -60,11 +62,11 @@ export default async function ProductSpotlight() {
         <p className="mt-6 max-w-md text-[15px] leading-relaxed text-paper/65">{description}</p>
         <div className="mt-8 flex items-center gap-4">
           <span className="font-display text-2xl font-bold text-paper">
-            {formatVnd(hero.price)}
+            {formatPrice(hero.price, locale, rate)}
           </span>
           {hero.compare_at_price && (
             <span className="text-sm text-paper/40 line-through">
-              {formatVnd(hero.compare_at_price)}
+              {formatPrice(hero.compare_at_price, locale, rate)}
             </span>
           )}
         </div>

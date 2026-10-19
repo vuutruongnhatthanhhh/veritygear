@@ -7,6 +7,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { ghnCalculateFee } from "@/lib/ghn";
 import { getPayOS } from "@/lib/payos";
 import { sendNewOrderNotification } from "@/lib/orderNotification";
+import { getExchangeRate } from "@/lib/exchangeRate";
 import { localizedPath } from "@/lib/seo";
 
 export type CheckoutState = { error?: string; orderCode?: string; paymentUrl?: string } | null;
@@ -45,6 +46,9 @@ async function siteOrigin(): Promise<string> {
 
 export async function placeOrder(_prev: CheckoutState, formData: FormData): Promise<CheckoutState> {
   const supabase = await createClient();
+  const locale = await getLocale();
+  const currency: "VND" | "USD" = locale === "en" ? "USD" : "VND";
+  const exchangeRate = currency === "USD" ? await getExchangeRate() : null;
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -131,6 +135,8 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
       subtotal,
       shipping_fee: shippingFee,
       total,
+      currency,
+      exchange_rate: exchangeRate,
       to_province_id: toProvinceIdRaw ? parseInt(toProvinceIdRaw) : null,
       to_province_name: toProvinceName || null,
       to_district_id: toDistrictIdRaw ? parseInt(toDistrictIdRaw) : null,
@@ -172,6 +178,8 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
     shippingFee,
     total,
     paymentMethod,
+    currency,
+    exchangeRate,
   };
 
   if (paymentMethod === "cod") {
@@ -184,7 +192,6 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
   // the same as confirmed ones.
   try {
     const origin = await siteOrigin();
-    const locale = await getLocale();
     const resultPath = `${localizedPath(locale, "/thanh-toan/ket-qua")}?oc=${order.order_code}`;
     const paymentLink = await getPayOS().paymentRequests.create({
       orderCode: order.id,

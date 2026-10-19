@@ -71,6 +71,8 @@ export async function POST(request: NextRequest) {
       shippingFee: order.shipping_fee,
       total: order.total,
       paymentMethod: "transfer",
+      currency: order.currency,
+      exchangeRate: order.exchange_rate,
     });
   } else if (status === "CANCELLED" || status === "EXPIRED") {
     const { error } = await admin

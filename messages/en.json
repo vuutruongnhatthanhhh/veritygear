@@ -162,6 +162,7 @@
     "paymentHeading": "Payment method",
     "cod": "Cash on delivery (COD) (Vietnam only)",
     "transfer": "Bank transfer (PayOS) (Vietnam only)",
+    "termsLabel": "I have read and accept the <link>Terms & Conditions</link>",
     "orderSummary": "Order ({count} products)",
     "qty": "Qty: {count}",
     "subtotal": "Subtotal",

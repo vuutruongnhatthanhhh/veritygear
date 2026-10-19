@@ -5,13 +5,14 @@ import { Link } from "@/i18n/navigation";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import type { Product } from "@/lib/types";
-import { formatVnd } from "@/lib/format";
 import { useCart } from "@/components/providers/CartProvider";
+import { useFormatPrice } from "@/components/providers/ExchangeRateProvider";
 
 export default function ProductCard({ product }: { product: Product }) {
   const t = useTranslations("productCard");
   const href = { pathname: "/san-pham/[slug]", params: { slug: product.slug } } as const;
   const { addItem } = useCart();
+  const formatPrice = useFormatPrice();
   const [added, setAdded] = useState(false);
 
   function handleAdd() {
@@ -59,10 +60,10 @@ export default function ProductCard({ product }: { product: Product }) {
         </div>
       </Link>
       <div className="mt-3 flex items-center gap-2">
-        <span className="text-sm font-semibold">{formatVnd(product.price)}</span>
+        <span className="text-sm font-semibold">{formatPrice(product.price)}</span>
         {product.compareAtPrice && (
           <span className="text-xs text-ink/35 line-through">
-            {formatVnd(product.compareAtPrice)}
+            {formatPrice(product.compareAtPrice)}
           </span>
         )}
       </div>

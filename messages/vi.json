@@ -162,6 +162,7 @@
     "paymentHeading": "Phương thức thanh toán",
     "cod": "Thanh toán khi nhận hàng (COD) (Chỉ dành cho khu vực Việt Nam)",
     "transfer": "Chuyển khoản ngân hàng (PayOS) (Chỉ dành cho khu vực Việt Nam)",
+    "termsLabel": "Tôi đã đọc và chấp nhận các <link>Điều khoản & Điều kiện</link>",
     "orderSummary": "Đơn hàng ({count} sản phẩm)",
     "qty": "SL: {count}",
     "subtotal": "Tạm tính",

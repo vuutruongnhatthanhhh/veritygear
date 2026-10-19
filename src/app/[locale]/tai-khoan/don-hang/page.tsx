@@ -2,7 +2,8 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { formatVnd } from "@/lib/format";
+import { formatPrice } from "@/lib/format";
+import { getExchangeRate } from "@/lib/exchangeRate";
 import type { OrderStatus } from "@/lib/types";
 import { localizedPath } from "@/lib/seo";
 
@@ -14,6 +15,7 @@ export default async function OrderHistoryPage() {
   const tStatus = await getTranslations("orderStatus");
   const tAccount = await getTranslations("account");
   const supabase = await createClient();
+  const rate = await getExchangeRate();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -62,7 +64,7 @@ export default async function OrderHistoryPage() {
                 <p className="mt-1 text-xs text-ink/50">{formatDate(o.created_at)}</p>
               </div>
               <div className="flex items-center gap-4">
-                <span className="text-sm font-semibold">{formatVnd(o.total)}</span>
+                <span className="text-sm font-semibold">{formatPrice(o.total, locale, rate)}</span>
                 <span className="rounded-full border border-ink/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em]">
                   {tStatus(o.status as OrderStatus)}
                 </span>

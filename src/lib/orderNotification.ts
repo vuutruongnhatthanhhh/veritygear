@@ -19,6 +19,8 @@ export type NewOrderEmailFields = {
   shippingFee: number;
   total: number;
   paymentMethod: "cod" | "transfer";
+  currency: "VND" | "USD";
+  exchangeRate: number | null;
 };
 
 function fullAddress(o: NewOrderEmailFields): string {
@@ -26,7 +28,7 @@ function fullAddress(o: NewOrderEmailFields): string {
 }
 
 function paymentLabel(method: "cod" | "transfer"): string {
-  return method === "transfer" ? "Chuyển khoản ngân hàng (đã thanh toán qua PayOS)" : "Khi nhận hàng (COD)";
+  return method === "transfer" ? "Bank transfer (paid via PayOS)" : "Cash on delivery (COD)";
 }
 
 function newOrderEmailHtml(o: NewOrderEmailFields) {
@@ -38,29 +40,32 @@ function newOrderEmailHtml(o: NewOrderEmailFields) {
     .join("");
 
   return emailLayout(`
-    <h2 style="margin:0 0 12px; font-size: 20px;">Đơn hàng mới: ${o.orderCode}</h2>
-    <p style="color:#444; line-height:1.6;"><strong>Khách hàng:</strong> ${o.fullName}</p>
-    <p style="color:#444; line-height:1.6;"><strong>Điện thoại:</strong> ${o.phone}</p>
+    <h2 style="margin:0 0 12px; font-size: 20px;">New order: ${o.orderCode}</h2>
+    <p style="color:#444; line-height:1.6;"><strong>Customer:</strong> ${o.fullName}</p>
+    <p style="color:#444; line-height:1.6;"><strong>Phone:</strong> ${o.phone}</p>
     <p style="color:#444; line-height:1.6;"><strong>Email:</strong> ${o.email}</p>
-    <p style="color:#444; line-height:1.6;"><strong>Địa chỉ:</strong> ${fullAddress(o)}</p>
-    ${o.note ? `<p style="color:#444; line-height:1.6;"><strong>Ghi chú:</strong> ${o.note}</p>` : ""}
-    <p style="color:#444; line-height:1.6;"><strong>Thanh toán:</strong> ${paymentLabel(o.paymentMethod)}</p>
+    <p style="color:#444; line-height:1.6;"><strong>Address:</strong> ${fullAddress(o)}</p>
+    ${o.note ? `<p style="color:#444; line-height:1.6;"><strong>Note:</strong> ${o.note}</p>` : ""}
+    <p style="color:#444; line-height:1.6;"><strong>Payment:</strong> ${paymentLabel(o.paymentMethod)}</p>
+    ${o.currency === "USD" ? `<p style="color:#444; line-height:1.6;"><strong>Currency:</strong> Customer viewed prices in USD (rate: 1 USD = ${formatVnd(o.exchangeRate ?? 0)}). Amount charged is still VND, shown below.</p>` : ""}
     <hr style="border:none; border-top:1px solid #eee; margin:20px 0;" />
     ${itemRows}
-    <p style="color:#444; line-height:1.6; margin-top:16px;">Tạm tính: ${formatVnd(o.subtotal)}</p>
-    <p style="color:#444; line-height:1.6;">Vận chuyển: ${o.shippingFee === 0 ? "Miễn phí" : formatVnd(o.shippingFee)}</p>
-    <p style="color:#0A0A0A; line-height:1.6; font-weight:700;">Tổng cộng: ${formatVnd(o.total)}</p>
-    ${emailButtonHtml(`mailto:${o.email}`, "LIÊN HỆ KHÁCH HÀNG")}
+    <p style="color:#444; line-height:1.6; margin-top:16px;">Subtotal: ${formatVnd(o.subtotal)}</p>
+    <p style="color:#444; line-height:1.6;">Shipping: ${o.shippingFee === 0 ? "Free" : formatVnd(o.shippingFee)}</p>
+    <p style="color:#0A0A0A; line-height:1.6; font-weight:700;">Total: ${formatVnd(o.total)}</p>
+    ${emailButtonHtml(`mailto:${o.email}`, "CONTACT CUSTOMER")}
   `);
 }
 
 function newOrderEmailText(o: NewOrderEmailFields) {
   const itemLines = o.items.map((i) => `${i.name} x${i.qty} - ${formatVnd(i.price * i.qty)}`).join("\n");
-  return `Đơn hàng mới: ${o.orderCode}\n\nKhách hàng: ${o.fullName}\nĐiện thoại: ${o.phone}\nEmail: ${o.email}\nĐịa chỉ: ${fullAddress(o)}${
-    o.note ? `\nGhi chú: ${o.note}` : ""
-  }\nThanh toán: ${paymentLabel(o.paymentMethod)}\n\n${itemLines}\n\nTạm tính: ${formatVnd(o.subtotal)}\nVận chuyển: ${
-    o.shippingFee === 0 ? "Miễn phí" : formatVnd(o.shippingFee)
-  }\nTổng cộng: ${formatVnd(o.total)}`;
+  return `New order: ${o.orderCode}\n\nCustomer: ${o.fullName}\nPhone: ${o.phone}\nEmail: ${o.email}\nAddress: ${fullAddress(o)}${
+    o.note ? `\nNote: ${o.note}` : ""
+  }\nPayment: ${paymentLabel(o.paymentMethod)}${
+    o.currency === "USD" ? `\nCurrency: USD (rate: 1 USD = ${formatVnd(o.exchangeRate ?? 0)}, amount charged is still VND)` : ""
+  }\n\n${itemLines}\n\nSubtotal: ${formatVnd(o.subtotal)}\nShipping: ${
+    o.shippingFee === 0 ? "Free" : formatVnd(o.shippingFee)
+  }\nTotal: ${formatVnd(o.total)}`;
 }
 
 export async function sendNewOrderNotification(fields: NewOrderEmailFields) {

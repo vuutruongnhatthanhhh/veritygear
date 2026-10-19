@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/public";
-import { formatVnd } from "@/lib/format";
+import { formatPrice } from "@/lib/format";
+import { getExchangeRate } from "@/lib/exchangeRate";
 import { pageMetadata, absoluteUrl } from "@/lib/seo";
 import type { Product } from "@/lib/types";
 import ProductActions from "@/components/product/ProductActions";
@@ -65,6 +66,7 @@ export default async function ProductDetailPage({
   const t = await getTranslations("productDetail");
   const tNav = await getTranslations("nav");
   const supabase = await createClient();
+  const rate = await getExchangeRate();
   const pick = (vi: string, en: string) => (locale === "en" ? en || vi : vi);
 
   const { data: guarantees } = await supabase.from("product_guarantees").select("*").eq("id", 1).single();
@@ -183,11 +185,11 @@ export default async function ProductDetailPage({
 
             <div className="mt-6 flex items-center gap-3">
               <span className="font-display text-2xl font-bold">
-                {formatVnd(product.price)}
+                {formatPrice(product.price, locale, rate)}
               </span>
               {product.compareAtPrice && (
                 <span className="text-sm text-ink/35 line-through">
-                  {formatVnd(product.compareAtPrice)}
+                  {formatPrice(product.compareAtPrice, locale, rate)}
                 </span>
               )}
             </div>

@@ -4,7 +4,8 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { formatVnd } from "@/lib/format";
+import { formatPrice } from "@/lib/format";
+import { getExchangeRate } from "@/lib/exchangeRate";
 import { localizedPath } from "@/lib/seo";
 import type { OrderStatus } from "@/lib/types";
 
@@ -17,6 +18,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ co
   const tStatus = await getTranslations("orderStatus");
   const tAccount = await getTranslations("account");
   const supabase = await createClient();
+  const rate = await getExchangeRate();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -110,7 +112,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ co
                 <p className="text-[13px] font-semibold uppercase tracking-wide">{item.product_name}</p>
                 <p className="mt-1 text-xs text-ink">{t("qty", { count: item.qty })}</p>
               </div>
-              <span className="text-sm font-semibold">{formatVnd(item.price * item.qty)}</span>
+              <span className="text-sm font-semibold">{formatPrice(item.price * item.qty, locale, rate)}</span>
             </div>
           ))}
         </div>
@@ -118,17 +120,19 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ co
         <div className="mt-6 flex flex-col gap-3 border-t border-ink/10 pt-6 text-sm">
           <div className="flex items-center justify-between">
             <span className="text-ink">{t("subtotal")}</span>
-            <span className="font-semibold">{formatVnd(order.subtotal)}</span>
+            <span className="font-semibold">{formatPrice(order.subtotal, locale, rate)}</span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-ink">{t("shippingLabel")}</span>
-            <span className="font-semibold">{order.shipping_fee === 0 ? t("free") : formatVnd(order.shipping_fee)}</span>
+            <span className="font-semibold">
+              {order.shipping_fee === 0 ? t("free") : formatPrice(order.shipping_fee, locale, rate)}
+            </span>
           </div>
         </div>
 
         <div className="mt-4 flex items-center justify-between border-t border-ink/10 pt-6 text-base">
           <span className="font-semibold">{t("total")}</span>
-          <span className="font-display text-xl font-bold">{formatVnd(order.total)}</span>
+          <span className="font-display text-xl font-bold">{formatPrice(order.total, locale, rate)}</span>
         </div>
       </div>
     </section>

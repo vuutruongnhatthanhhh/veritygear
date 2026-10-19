@@ -6,8 +6,10 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ScrollToTopButton from "@/components/ScrollToTopButton";
 import { CartProvider } from "@/components/providers/CartProvider";
+import { ExchangeRateProvider } from "@/components/providers/ExchangeRateProvider";
 import { OrganizationJsonLd } from "@/components/seo/JsonLd";
 import { createClient } from "@/lib/supabase/public";
+import { getExchangeRate } from "@/lib/exchangeRate";
 import { SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE, absoluteUrl } from "@/lib/seo";
 import { routing } from "@/i18n/routing";
 
@@ -92,17 +94,20 @@ export default async function LocaleLayout({
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
+  const rate = await getExchangeRate();
 
   return (
     <>
       <OrganizationJsonLd />
       <NextIntlClientProvider>
-        <CartProvider>
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
-          <ScrollToTopButton />
-        </CartProvider>
+        <ExchangeRateProvider rate={rate}>
+          <CartProvider>
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+            <ScrollToTopButton />
+          </CartProvider>
+        </ExchangeRateProvider>
       </NextIntlClientProvider>
     </>
   );

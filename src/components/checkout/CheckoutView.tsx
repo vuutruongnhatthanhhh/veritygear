@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { useCart } from "@/components/providers/CartProvider";
-import { formatVnd } from "@/lib/format";
+import { useFormatPrice } from "@/components/providers/ExchangeRateProvider";
 import { placeOrder } from "@/app/[locale]/thanh-toan/actions";
 import { GhnAddressFields } from "./GhnAddressFields";
 
@@ -25,14 +25,17 @@ export default function CheckoutView({
   prefill,
   shipping,
   ghnEnabled,
+  termsUrl,
 }: {
   prefill: Prefill;
   shipping: ShippingConfig;
   ghnEnabled: boolean;
+  termsUrl: string;
 }) {
   const t = useTranslations("checkout");
   const tNav = useTranslations("nav");
   const { items, subtotal, clear } = useCart();
+  const formatPrice = useFormatPrice();
   const [state, action, pending] = useActionState(placeOrder, null);
   const [ghnFee, setGhnFee] = useState<number | null>(null);
   const [feeLoading, setFeeLoading] = useState(false);
@@ -261,7 +264,7 @@ export default function CheckoutView({
                     <p className="mt-1 text-xs text-ink">{t("qty", { count: item.qty })}</p>
                   </div>
                   <span className="text-sm font-semibold">
-                    {formatVnd(item.price * item.qty)}
+                    {formatPrice(item.price * item.qty)}
                   </span>
                 </div>
               ))}
@@ -270,12 +273,12 @@ export default function CheckoutView({
             <div className="mt-6 flex flex-col gap-3 border-t border-ink/10 pt-6 text-sm">
               <div className="flex items-center justify-between">
                 <span className="text-ink/60">{t("subtotal")}</span>
-                <span className="font-semibold">{formatVnd(subtotal)}</span>
+                <span className="font-semibold">{formatPrice(subtotal)}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-ink/60">{t("shippingLabel")}</span>
                 <span className="font-semibold">
-                  {feeLoading ? "..." : shippingCost === 0 ? t("free") : formatVnd(shippingCost)}
+                  {feeLoading ? "..." : shippingCost === 0 ? t("free") : formatPrice(shippingCost)}
                 </span>
               </div>
               {ghnFeeError && (
@@ -287,13 +290,26 @@ export default function CheckoutView({
 
             <div className="mt-4 flex items-center justify-between border-t border-ink/10 pt-6 text-base">
               <span className="font-semibold">{t("total")}</span>
-              <span className="font-display text-xl font-bold">{formatVnd(total)}</span>
+              <span className="font-display text-xl font-bold">{formatPrice(total)}</span>
             </div>
+
+            <label className="mt-6 flex items-start gap-2 text-[13px] leading-relaxed text-ink/70">
+              <input type="checkbox" name="terms" required className="mt-0.5 h-4 w-4 shrink-0 accent-ink" />
+              <span>
+                {t.rich("termsLabel", {
+                  link: (chunks) => (
+                    <a href={termsUrl} target="_blank" rel="noopener noreferrer" className="underline hover:text-ink">
+                      {chunks}
+                    </a>
+                  ),
+                })}
+              </span>
+            </label>
 
             <button
               type="submit"
               disabled={pending || redirecting}
-              className="mt-6 h-13 w-full bg-ink px-8 text-[13px] font-semibold uppercase tracking-[0.14em] text-paper transition-transform hover:scale-[1.02] disabled:opacity-60"
+              className="mt-4 h-13 w-full bg-ink px-8 text-[13px] font-semibold uppercase tracking-[0.14em] text-paper transition-transform hover:scale-[1.02] disabled:opacity-60"
             >
               {redirecting ? t("redirecting") : pending ? t("submitting") : t("submit")}
             </button>

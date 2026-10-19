@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { formatVnd } from "@/lib/format";
+import { useFormatPrice } from "@/components/providers/ExchangeRateProvider";
 
 type SearchProduct = { slug: string; name: string; category: string; tagline: string; price: number; image: string };
 
@@ -27,6 +27,7 @@ export default function SearchOverlay({
   onClose: () => void;
 }) {
   const locale = useLocale();
+  const formatPrice = useFormatPrice();
   const [query, setQuery] = useState("");
   const [catalog, setCatalog] = useState<SearchProduct[]>([]);
   const [loaded, setLoaded] = useState(false);
@@ -184,7 +185,7 @@ export default function SearchOverlay({
                         </h3>
                       </div>
                       <span className="shrink-0 text-sm font-semibold">
-                        {formatVnd(product.price)}
+                        {formatPrice(product.price)}
                       </span>
                     </Link>
                   </li>

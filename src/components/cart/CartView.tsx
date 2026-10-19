@@ -4,12 +4,13 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { useCart, MAX_QTY_PER_PRODUCT } from "@/components/providers/CartProvider";
-import { formatVnd } from "@/lib/format";
+import { useFormatPrice } from "@/components/providers/ExchangeRateProvider";
 
 export default function CartView({ freeShippingThreshold }: { freeShippingThreshold: number }) {
   const t = useTranslations("cart");
   const tNav = useTranslations("nav");
   const { items, subtotal, setQty, removeItem } = useCart();
+  const formatPrice = useFormatPrice();
 
   if (items.length === 0) {
     return (
@@ -72,7 +73,7 @@ export default function CartView({ freeShippingThreshold }: { freeShippingThresh
                         </h3>
                       </Link>
                       <p className="mt-1 text-sm text-ink/55">
-                        {formatVnd(item.price)}
+                        {formatPrice(item.price)}
                       </p>
                     </div>
                     <button
@@ -109,7 +110,7 @@ export default function CartView({ freeShippingThreshold }: { freeShippingThresh
                       </button>
                     </div>
                     <span className="text-sm font-semibold">
-                      {formatVnd(item.price * item.qty)}
+                      {formatPrice(item.price * item.qty)}
                     </span>
                   </div>
                 </div>
@@ -122,16 +123,16 @@ export default function CartView({ freeShippingThreshold }: { freeShippingThresh
 
             <div className="mt-6 flex items-center justify-between text-sm">
               <span className="text-ink/60">{t("subtotal")}</span>
-              <span className="font-semibold">{formatVnd(subtotal)}</span>
+              <span className="font-semibold">{formatPrice(subtotal)}</span>
             </div>
             <p className="mt-3 text-[13px] leading-relaxed text-ink/50">
-              {remaining > 0 ? t("remaining", { amount: formatVnd(remaining) }) : t("freeShippingReached")}
+              {remaining > 0 ? t("remaining", { amount: formatPrice(remaining) }) : t("freeShippingReached")}
             </p>
 
             <div className="mt-6 flex items-center justify-between border-t border-ink/10 pt-6 text-base">
               <span className="font-semibold">{t("total")}</span>
               <span className="font-display text-xl font-bold">
-                {formatVnd(subtotal)}
+                {formatPrice(subtotal)}
               </span>
             </div>
 
