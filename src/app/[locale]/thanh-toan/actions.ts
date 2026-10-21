@@ -48,7 +48,9 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
   const supabase = await createClient();
   const locale = await getLocale();
   const currency: "VND" | "USD" = locale === "en" ? "USD" : "VND";
-  const exchangeRate = currency === "USD" ? await getExchangeRate() : null;
+  // Always fetched (not just for USD-locale orders) so the admin
+  // notification email can always show a USD equivalent alongside VND.
+  const exchangeRate = await getExchangeRate();
   const {
     data: { user },
   } = await supabase.auth.getUser();

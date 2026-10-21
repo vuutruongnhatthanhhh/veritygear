@@ -31,11 +31,21 @@ function paymentLabel(method: "cod" | "transfer"): string {
   return method === "transfer" ? "Bank transfer (paid via PayOS)" : "Cash on delivery (COD)";
 }
 
+// Amount actually charged is always VND — always show the USD equivalent
+// alongside it too (using the rate snapshotted at order time), regardless of
+// which currency the customer was viewing at checkout.
+function formatAmount(o: NewOrderEmailFields, amountVnd: number): string {
+  const vnd = formatVnd(amountVnd);
+  if (!o.exchangeRate) return vnd;
+  const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amountVnd / o.exchangeRate);
+  return `${vnd} (~${usd})`;
+}
+
 function newOrderEmailHtml(o: NewOrderEmailFields) {
   const itemRows = o.items
     .map(
       (i) =>
-        `<p style="color:#444; line-height:1.6; margin:4px 0;">${i.name} × ${i.qty} — ${formatVnd(i.price * i.qty)}</p>`,
+        `<p style="color:#444; line-height:1.6; margin:4px 0;">${i.name} × ${i.qty} — ${formatAmount(o, i.price * i.qty)}</p>`,
     )
     .join("");
 
@@ -47,25 +57,27 @@ function newOrderEmailHtml(o: NewOrderEmailFields) {
     <p style="color:#444; line-height:1.6;"><strong>Address:</strong> ${fullAddress(o)}</p>
     ${o.note ? `<p style="color:#444; line-height:1.6;"><strong>Note:</strong> ${o.note}</p>` : ""}
     <p style="color:#444; line-height:1.6;"><strong>Payment:</strong> ${paymentLabel(o.paymentMethod)}</p>
-    ${o.currency === "USD" ? `<p style="color:#444; line-height:1.6;"><strong>Currency:</strong> Customer viewed prices in USD (rate: 1 USD = ${formatVnd(o.exchangeRate ?? 0)}). Amount charged is still VND, shown below.</p>` : ""}
+    ${o.exchangeRate ? `<p style="color:#444; line-height:1.6;"><strong>Exchange rate:</strong> 1 USD = ${formatVnd(o.exchangeRate)}${o.currency === "USD" ? " (customer was viewing prices in USD at checkout)" : ""}. Amount charged is always VND — USD equivalent shown in parentheses below.</p>` : ""}
     <hr style="border:none; border-top:1px solid #eee; margin:20px 0;" />
     ${itemRows}
-    <p style="color:#444; line-height:1.6; margin-top:16px;">Subtotal: ${formatVnd(o.subtotal)}</p>
-    <p style="color:#444; line-height:1.6;">Shipping: ${o.shippingFee === 0 ? "Free" : formatVnd(o.shippingFee)}</p>
-    <p style="color:#0A0A0A; line-height:1.6; font-weight:700;">Total: ${formatVnd(o.total)}</p>
+    <p style="color:#444; line-height:1.6; margin-top:16px;">Subtotal: ${formatAmount(o, o.subtotal)}</p>
+    <p style="color:#444; line-height:1.6;">Shipping: ${o.shippingFee === 0 ? "Free" : formatAmount(o, o.shippingFee)}</p>
+    <p style="color:#0A0A0A; line-height:1.6; font-weight:700;">Total: ${formatAmount(o, o.total)}</p>
     ${emailButtonHtml(`mailto:${o.email}`, "CONTACT CUSTOMER")}
   `);
 }
 
 function newOrderEmailText(o: NewOrderEmailFields) {
-  const itemLines = o.items.map((i) => `${i.name} x${i.qty} - ${formatVnd(i.price * i.qty)}`).join("\n");
+  const itemLines = o.items.map((i) => `${i.name} x${i.qty} - ${formatAmount(o, i.price * i.qty)}`).join("\n");
   return `New order: ${o.orderCode}\n\nCustomer: ${o.fullName}\nPhone: ${o.phone}\nEmail: ${o.email}\nAddress: ${fullAddress(o)}${
     o.note ? `\nNote: ${o.note}` : ""
   }\nPayment: ${paymentLabel(o.paymentMethod)}${
-    o.currency === "USD" ? `\nCurrency: USD (rate: 1 USD = ${formatVnd(o.exchangeRate ?? 0)}, amount charged is still VND)` : ""
-  }\n\n${itemLines}\n\nSubtotal: ${formatVnd(o.subtotal)}\nShipping: ${
-    o.shippingFee === 0 ? "Free" : formatVnd(o.shippingFee)
-  }\nTotal: ${formatVnd(o.total)}`;
+    o.exchangeRate
+      ? `\nExchange rate: 1 USD = ${formatVnd(o.exchangeRate)}${o.currency === "USD" ? " (customer was viewing prices in USD at checkout)" : ""} — amount charged is always VND, USD equivalent in parentheses`
+      : ""
+  }\n\n${itemLines}\n\nSubtotal: ${formatAmount(o, o.subtotal)}\nShipping: ${
+    o.shippingFee === 0 ? "Free" : formatAmount(o, o.shippingFee)
+  }\nTotal: ${formatAmount(o, o.total)}`;
 }
 
 export async function sendNewOrderNotification(fields: NewOrderEmailFields) {
