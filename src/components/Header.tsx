@@ -161,12 +161,17 @@ export default function Header() {
             <button
               type="button"
               onClick={() => switchLocale("en")}
+              aria-label="English"
               aria-pressed={locale === "en"}
               className={`transition-opacity ${
                 locale === "en" ? "opacity-100" : "opacity-50 hover:opacity-80"
               }`}
             >
-              EN
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M2 12h20" />
+                <path d="M12 2c3 2.7 4.5 6.3 4.5 10s-1.5 7.3-4.5 10c-3-2.7-4.5-6.3-4.5-10S9 4.7 12 2z" />
+              </svg>
             </button>
           </div>
           <button

@@ -31,14 +31,12 @@ function paymentLabel(method: "cod" | "transfer"): string {
   return method === "transfer" ? "Bank transfer (paid via PayOS)" : "Cash on delivery (COD)";
 }
 
-// Amount actually charged is always VND — always show the USD equivalent
-// alongside it too (using the rate snapshotted at order time), regardless of
-// which currency the customer was viewing at checkout.
+// Amount actually charged is always VND, but shown here converted to USD
+// (using the rate snapshotted at order time) — falls back to VND only if no
+// rate was captured (e.g. legacy orders placed before this field existed).
 function formatAmount(o: NewOrderEmailFields, amountVnd: number): string {
-  const vnd = formatVnd(amountVnd);
-  if (!o.exchangeRate) return vnd;
-  const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amountVnd / o.exchangeRate);
-  return `${vnd} (~${usd})`;
+  if (!o.exchangeRate) return formatVnd(amountVnd);
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amountVnd / o.exchangeRate);
 }
 
 function newOrderEmailHtml(o: NewOrderEmailFields) {
@@ -57,7 +55,7 @@ function newOrderEmailHtml(o: NewOrderEmailFields) {
     <p style="color:#444; line-height:1.6;"><strong>Address:</strong> ${fullAddress(o)}</p>
     ${o.note ? `<p style="color:#444; line-height:1.6;"><strong>Note:</strong> ${o.note}</p>` : ""}
     <p style="color:#444; line-height:1.6;"><strong>Payment:</strong> ${paymentLabel(o.paymentMethod)}</p>
-    ${o.exchangeRate ? `<p style="color:#444; line-height:1.6;"><strong>Exchange rate:</strong> 1 USD = ${formatVnd(o.exchangeRate)}${o.currency === "USD" ? " (customer was viewing prices in USD at checkout)" : ""}. Amount charged is always VND — USD equivalent shown in parentheses below.</p>` : ""}
+    ${o.exchangeRate ? `<p style="color:#444; line-height:1.6;"><strong>Exchange rate:</strong> 1 USD = ${formatVnd(o.exchangeRate)}${o.currency === "USD" ? " (customer was viewing prices in USD at checkout)" : ""}. Amounts below are converted to USD — the actual charge is always VND.</p>` : ""}
     <hr style="border:none; border-top:1px solid #eee; margin:20px 0;" />
     ${itemRows}
     <p style="color:#444; line-height:1.6; margin-top:16px;">Subtotal: ${formatAmount(o, o.subtotal)}</p>
@@ -73,7 +71,7 @@ function newOrderEmailText(o: NewOrderEmailFields) {
     o.note ? `\nNote: ${o.note}` : ""
   }\nPayment: ${paymentLabel(o.paymentMethod)}${
     o.exchangeRate
-      ? `\nExchange rate: 1 USD = ${formatVnd(o.exchangeRate)}${o.currency === "USD" ? " (customer was viewing prices in USD at checkout)" : ""} — amount charged is always VND, USD equivalent in parentheses`
+      ? `\nExchange rate: 1 USD = ${formatVnd(o.exchangeRate)}${o.currency === "USD" ? " (customer was viewing prices in USD at checkout)" : ""} — amounts below are converted to USD, actual charge is always VND`
       : ""
   }\n\n${itemLines}\n\nSubtotal: ${formatAmount(o, o.subtotal)}\nShipping: ${
     o.shippingFee === 0 ? "Free" : formatAmount(o, o.shippingFee)
