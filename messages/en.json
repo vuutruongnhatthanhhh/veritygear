@@ -63,7 +63,9 @@
   },
   "aboutTeam": {
     "eyebrow": "Team",
-    "heading": "The people behind VERITY GEAR"
+    "heading": "The people behind VERITY GEAR",
+    "regionVn": "Vietnam",
+    "regionGlobal": "Global"
   },
   "milestonesTimeline": {
     "eyebrow": "Our journey",

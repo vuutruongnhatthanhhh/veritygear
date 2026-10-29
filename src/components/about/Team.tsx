@@ -2,12 +2,48 @@ import Image from "next/image";
 import { getLocale, getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/public";
 
-const FALLBACK_TEAM = [
-  { name: "Đăng Khoa", role_vi: "Nhà sáng lập & CEO", role_en: "Founder & CEO", image_url: "/images/about/team-1.jpg" },
-  { name: "Linh Chi", role_vi: "Trưởng phòng thiết kế", role_en: "Head of Design", image_url: "/images/about/team-2.jpg" },
-  { name: "Quang Huy", role_vi: "Trưởng phòng sản phẩm", role_en: "Head of Product", image_url: "/images/about/team-3.jpg" },
-  { name: "Bảo Trân", role_vi: "Quản lý cộng đồng", role_en: "Community Manager", image_url: "/images/about/team-4.jpg" },
+type TeamMember = {
+  name: string;
+  role_vi: string;
+  role_en: string;
+  image_url: string | null;
+  region: "vn" | "global";
+  social_url: string;
+};
+
+const FALLBACK_TEAM: TeamMember[] = [
+  { name: "Đăng Khoa", role_vi: "Nhà sáng lập & CEO", role_en: "Founder & CEO", image_url: "/images/about/team-1.jpg", region: "vn", social_url: "" },
+  { name: "Linh Chi", role_vi: "Trưởng phòng thiết kế", role_en: "Head of Design", image_url: "/images/about/team-2.jpg", region: "vn", social_url: "" },
+  { name: "Quang Huy", role_vi: "Trưởng phòng sản phẩm", role_en: "Head of Product", image_url: "/images/about/team-3.jpg", region: "vn", social_url: "" },
+  { name: "Bảo Trân", role_vi: "Quản lý cộng đồng", role_en: "Community Manager", image_url: "/images/about/team-4.jpg", region: "vn", social_url: "" },
 ];
+
+function TeamCard({ member, pick }: { member: TeamMember; pick: (vi: string, en: string) => string }) {
+  const Tag = member.social_url ? "a" : "div";
+  const linkProps = member.social_url ? { href: member.social_url, target: "_blank", rel: "noopener noreferrer" } : {};
+
+  return (
+    <Tag {...linkProps} className="group relative block overflow-hidden bg-ink">
+      <div className="relative aspect-3/4 w-full">
+        <Image
+          src={member.image_url || "/images/about/team-1.jpg"}
+          alt={member.name}
+          fill
+          sizes="(min-width: 1024px) 25vw, 50vw"
+          className="object-cover grayscale transition-all duration-500 ease-out group-hover:scale-105 group-hover:grayscale-0"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/10 to-transparent" />
+        <span className="absolute left-0 top-0 h-[2px] w-0 bg-paper transition-all duration-500 ease-out group-hover:w-full" />
+        <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
+          <h3 className="font-display text-base font-bold text-paper">{member.name}</h3>
+          <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-paper/60">
+            {pick(member.role_vi, member.role_en)}
+          </p>
+        </div>
+      </div>
+    </Tag>
+  );
+}
 
 export default async function Team() {
   const locale = await getLocale();
@@ -15,8 +51,11 @@ export default async function Team() {
   const supabase = await createClient();
   const { data } = await supabase.from("about_team_members").select("*").order("sort_order");
 
-  const team = data && data.length > 0 ? data : FALLBACK_TEAM;
+  const team: TeamMember[] = data && data.length > 0 ? data : FALLBACK_TEAM;
   const pick = (vi: string, en: string) => (locale === "en" ? en || vi : vi);
+
+  const vnTeam = team.filter((m) => m.region !== "global");
+  const globalTeam = team.filter((m) => m.region === "global");
 
   return (
     <section className="mx-auto max-w-[1600px] px-6 py-24 sm:px-10 sm:py-32">
@@ -27,28 +66,32 @@ export default async function Team() {
         </h2>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-        {team.map((member, i) => (
-          <div key={i} className="group relative overflow-hidden bg-ink">
-            <div className="relative aspect-3/4 w-full">
-              <Image
-                src={member.image_url || "/images/about/team-1.jpg"}
-                alt={member.name}
-                fill
-                sizes="(min-width: 1024px) 25vw, 50vw"
-                className="object-cover grayscale transition-all duration-500 ease-out group-hover:scale-105 group-hover:grayscale-0"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/10 to-transparent" />
-              <span className="absolute left-0 top-0 h-[2px] w-0 bg-paper transition-all duration-500 ease-out group-hover:w-full" />
-              <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
-                <h3 className="font-display text-base font-bold text-paper">{member.name}</h3>
-                <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-paper/60">
-                  {pick(member.role_vi, member.role_en)}
-                </p>
-              </div>
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-10">
+        {vnTeam.length > 0 && (
+          <div>
+            <h3 className="mb-5 text-center text-[12px] font-bold uppercase tracking-[0.2em] text-ink">
+              {t("regionVn")}
+            </h3>
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+              {vnTeam.map((member, i) => (
+                <TeamCard key={i} member={member} pick={pick} />
+              ))}
             </div>
           </div>
-        ))}
+        )}
+
+        {globalTeam.length > 0 && (
+          <div>
+            <h3 className="mb-5 text-center text-[12px] font-bold uppercase tracking-[0.2em] text-ink">
+              {t("regionGlobal")}
+            </h3>
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+              {globalTeam.map((member, i) => (
+                <TeamCard key={i} member={member} pick={pick} />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

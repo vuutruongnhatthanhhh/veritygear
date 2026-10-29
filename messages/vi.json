@@ -63,7 +63,9 @@
   },
   "aboutTeam": {
     "eyebrow": "Đội ngũ",
-    "heading": "Những người đứng sau VERITY GEAR"
+    "heading": "Những người đứng sau VERITY GEAR",
+    "regionVn": "Việt Nam",
+    "regionGlobal": "Global"
   },
   "milestonesTimeline": {
     "eyebrow": "Hành trình",
