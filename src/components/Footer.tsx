@@ -11,7 +11,7 @@ export default async function Footer() {
   const locale = await getLocale();
   const pick = (vi: string, en: string) => (locale === "en" ? en || vi : vi);
   const supabase = await createClient();
-  const [{ data: socialRow }, { data: categoryRows }, { data: footerRow }, { data: customPageRows }] =
+  const [{ data: socialRow }, { data: categoryRows }, { data: footerRow }, { data: customPageRows }, { data: businessInfoRow }] =
     await Promise.all([
       supabase.from("site_social_links").select("*").eq("id", 1).single(),
       supabase.from("product_categories").select("slug, name_vi, name_en").order("sort_order"),
@@ -21,9 +21,11 @@ export default async function Footer() {
         .select("slug, title_vi, title_en")
         .eq("is_active", true)
         .order("sort_order"),
+      supabase.from("site_business_info").select("content_vi, content_en").eq("id", 1).single(),
     ]);
   const socialLinks = toSocialLinks(socialRow);
   const tagline = footerRow ? pick(footerRow.tagline_vi, footerRow.tagline_en) : "";
+  const businessInfo = businessInfoRow ? pick(businessInfoRow.content_vi, businessInfoRow.content_en) : "";
 
   type FooterHref = ComponentProps<typeof Link>["href"];
   type FooterLink = { label: string; href: FooterHref };
@@ -57,7 +59,7 @@ export default async function Footer() {
   return (
     <footer id="lien-he" className="border-t border-ink/10 bg-ink text-paper">
       <div className="mx-auto max-w-[1600px] px-6 py-16 sm:px-10 sm:py-20">
-        <div className="grid grid-cols-2 gap-10 sm:grid-cols-2 md:grid-cols-5">
+        <div className="grid grid-cols-2 gap-10 sm:grid-cols-2 md:grid-cols-6">
           <div className="col-span-2">
             <Image
               src="/images/logo/logo-white.png"
@@ -89,6 +91,18 @@ export default async function Footer() {
               </ul>
             </div>
           ))}
+
+          {businessInfo && (
+            <div>
+              <h4 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-paper/40">
+                {t("footer.businessInfoTitle")}
+              </h4>
+              <div
+                className="mt-5 text-sm leading-relaxed text-paper/70 [&_a]:text-paper [&_a]:underline [&_p]:mb-3 [&_p:last-child]:mb-0 [&_strong]:font-semibold [&_strong]:text-paper"
+                dangerouslySetInnerHTML={{ __html: businessInfo }}
+              />
+            </div>
+          )}
         </div>
 
         <div className="mt-16 flex flex-col gap-4 border-t border-paper/10 pt-8 text-xs text-paper/40 sm:flex-row sm:items-center sm:justify-between">
