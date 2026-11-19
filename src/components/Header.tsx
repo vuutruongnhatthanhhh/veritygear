@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import SocialLinks from "./SocialLinks";
 import SearchOverlay from "./SearchOverlay";
 import { useCart } from "./providers/CartProvider";
+import { useGuestOrders } from "./providers/GuestOrdersProvider";
 import { createClient } from "@/lib/supabase/client";
 import { toSocialLinks, FALLBACK_SOCIAL_LINKS, type SocialLink } from "@/lib/socialLinks";
 
@@ -41,6 +42,7 @@ export default function Header() {
   const params = useParams();
   const hasHero = HERO_ROUTES.has(pathname);
   const { itemCount } = useCart();
+  const { orders: guestOrders } = useGuestOrders();
   const locale = useLocale();
   const router = useRouter();
   const t = useTranslations("nav");
@@ -50,6 +52,7 @@ export default function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>(FALLBACK_SOCIAL_LINKS);
+  const accountHref = loggedIn ? "/tai-khoan" : guestOrders.length > 0 ? "/tai-khoan/don-hang" : "/dang-nhap";
 
   useEffect(() => {
     const supabase = createClient();
@@ -187,7 +190,7 @@ export default function Header() {
             </svg>
           </button>
           <Link
-            href={loggedIn ? "/tai-khoan" : "/dang-nhap"}
+            href={accountHref}
             aria-label={loggedIn ? t("account") : t("login")}
             className={`transition-colors duration-500 ${
               solid ? "text-ink hover:text-ink/70" : "text-paper/80 hover:text-paper"
@@ -269,7 +272,7 @@ export default function Header() {
           </Link>
         ))}
         <Link
-          href={loggedIn ? "/tai-khoan" : "/dang-nhap"}
+          href={accountHref}
           onClick={() => setOpen(false)}
           className="border-b border-ink/10 py-5 font-display text-2xl font-bold uppercase tracking-wide text-ink"
         >

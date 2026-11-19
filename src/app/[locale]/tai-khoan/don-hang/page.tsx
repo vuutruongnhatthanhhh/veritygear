@@ -1,11 +1,10 @@
 import { getLocale, getTranslations } from "next-intl/server";
-import { redirect } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { formatPrice } from "@/lib/format";
 import { getExchangeRate } from "@/lib/exchangeRate";
 import type { OrderStatus } from "@/lib/types";
-import { localizedPath } from "@/lib/seo";
+import { GuestOrderHistory } from "./GuestOrderHistory";
 
 export const metadata = { title: "Đơn hàng của tôi — VERITY GEAR", robots: { index: false, follow: false } };
 
@@ -21,9 +20,7 @@ export default async function OrderHistoryPage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    const next = localizedPath(locale, "/tai-khoan/don-hang");
-    redirect({ href: { pathname: "/dang-nhap", query: { next } }, locale });
-    return;
+    return <GuestOrderHistory />;
   }
 
   const { data: orders } = await supabase

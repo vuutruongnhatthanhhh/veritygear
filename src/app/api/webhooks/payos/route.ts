@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getPayOS } from "@/lib/payos";
-import { sendNewOrderNotification } from "@/lib/orderNotification";
+import { sendNewOrderNotification, sendCustomerOrderConfirmation } from "@/lib/orderNotification";
+import { absoluteUrl } from "@/lib/seo";
 import type { Webhook } from "@payos/node";
 
 // PayOS signs payloads with the checksum key (verified below), so unlike the
@@ -56,7 +57,11 @@ export async function POST(request: NextRequest) {
 
     type OrderItemRow = { product_slug: string; product_name: string; product_image: string | null; price: number; qty: number };
     const items: OrderItemRow[] = order.order_items ?? [];
-    await sendNewOrderNotification({
+    const locale: "vi" | "en" = order.currency === "USD" ? "en" : "vi";
+    const viewOrderUrl = `${absoluteUrl(locale, `/tai-khoan/don-hang/${order.order_code}`)}${
+      order.guest_token ? `?t=${order.guest_token}` : ""
+    }`;
+    const emailFields = {
       orderCode: order.order_code,
       fullName: order.full_name,
       phone: order.phone,
@@ -70,10 +75,14 @@ export async function POST(request: NextRequest) {
       subtotal: order.subtotal,
       shippingFee: order.shipping_fee,
       total: order.total,
-      paymentMethod: "transfer",
+      paymentMethod: "transfer" as const,
       currency: order.currency,
       exchangeRate: order.exchange_rate,
-    });
+      locale,
+      viewOrderUrl,
+    };
+    await sendNewOrderNotification(emailFields);
+    await sendCustomerOrderConfirmation(emailFields);
   } else if (status === "CANCELLED" || status === "EXPIRED") {
     const { error } = await admin
       .from("orders")

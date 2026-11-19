@@ -1,6 +1,8 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getTransporter, hasSmtpConfig, getMailFrom, emailLayout, emailButtonHtml } from "@/lib/mailer";
-import { formatVnd } from "@/lib/format";
+import { formatVnd, formatPrice } from "@/lib/format";
+
+const DEFAULT_USD_TO_VND = 25000;
 
 type CartItemInput = { slug: string; name: string; image: string; price: number; qty: number };
 
@@ -21,6 +23,8 @@ export type NewOrderEmailFields = {
   paymentMethod: "cod" | "transfer";
   currency: "VND" | "USD";
   exchangeRate: number | null;
+  locale: "vi" | "en";
+  viewOrderUrl: string;
 };
 
 function fullAddress(o: NewOrderEmailFields): string {
@@ -98,5 +102,91 @@ export async function sendNewOrderNotification(fields: NewOrderEmailFields) {
     });
   } catch (err) {
     console.error("Failed to send new order notification email:", err);
+  }
+}
+
+const CUSTOMER_TEXT = {
+  vi: {
+    subject: (code: string) => `Xác nhận đơn hàng ${code} — VERITY GEAR`,
+    heading: (code: string) => `Cảm ơn bạn đã đặt hàng! Mã đơn hàng: ${code}`,
+    intro: "Đơn hàng của bạn đã được ghi nhận. Dưới đây là chi tiết đơn hàng:",
+    address: "Địa chỉ giao hàng",
+    payment: "Phương thức thanh toán",
+    paymentCod: "Thanh toán khi nhận hàng (COD)",
+    paymentTransfer: "Chuyển khoản ngân hàng (PayOS)",
+    subtotal: "Tạm tính",
+    shipping: "Vận chuyển",
+    free: "Miễn phí",
+    total: "Tổng cộng",
+    viewOrder: "XEM ĐƠN HÀNG",
+  },
+  en: {
+    subject: (code: string) => `Order confirmation ${code} — VERITY GEAR`,
+    heading: (code: string) => `Thank you for your order! Order code: ${code}`,
+    intro: "Your order has been received. Here are the details:",
+    address: "Shipping address",
+    payment: "Payment method",
+    paymentCod: "Cash on delivery (COD)",
+    paymentTransfer: "Bank transfer (PayOS)",
+    subtotal: "Subtotal",
+    shipping: "Shipping",
+    free: "Free",
+    total: "Total",
+    viewOrder: "VIEW ORDER",
+  },
+} as const;
+
+function customerAmount(o: NewOrderEmailFields, amountVnd: number): string {
+  return formatPrice(amountVnd, o.locale, o.exchangeRate ?? DEFAULT_USD_TO_VND);
+}
+
+function customerOrderEmailHtml(o: NewOrderEmailFields) {
+  const tx = CUSTOMER_TEXT[o.locale];
+  const itemRows = o.items
+    .map(
+      (i) =>
+        `<p style="color:#444; line-height:1.6; margin:4px 0;">${i.name} × ${i.qty} — ${customerAmount(o, i.price * i.qty)}</p>`,
+    )
+    .join("");
+
+  return emailLayout(`
+    <h2 style="margin:0 0 12px; font-size: 20px;">${tx.heading(o.orderCode)}</h2>
+    <p style="color:#444; line-height:1.6;">${tx.intro}</p>
+    <p style="color:#444; line-height:1.6; margin-top:16px;"><strong>${tx.address}:</strong> ${o.fullName}, ${o.phone}, ${fullAddress(o)}</p>
+    <p style="color:#444; line-height:1.6;"><strong>${tx.payment}:</strong> ${o.paymentMethod === "transfer" ? tx.paymentTransfer : tx.paymentCod}</p>
+    <hr style="border:none; border-top:1px solid #eee; margin:20px 0;" />
+    ${itemRows}
+    <p style="color:#444; line-height:1.6; margin-top:16px;">${tx.subtotal}: ${customerAmount(o, o.subtotal)}</p>
+    <p style="color:#444; line-height:1.6;">${tx.shipping}: ${o.shippingFee === 0 ? tx.free : customerAmount(o, o.shippingFee)}</p>
+    <p style="color:#0A0A0A; line-height:1.6; font-weight:700;">${tx.total}: ${customerAmount(o, o.total)}</p>
+    ${emailButtonHtml(o.viewOrderUrl, tx.viewOrder)}
+  `);
+}
+
+function customerOrderEmailText(o: NewOrderEmailFields) {
+  const tx = CUSTOMER_TEXT[o.locale];
+  const itemLines = o.items.map((i) => `${i.name} x${i.qty} - ${customerAmount(o, i.price * i.qty)}`).join("\n");
+  return `${tx.heading(o.orderCode)}\n\n${tx.intro}\n\n${tx.address}: ${o.fullName}, ${o.phone}, ${fullAddress(o)}\n${tx.payment}: ${
+    o.paymentMethod === "transfer" ? tx.paymentTransfer : tx.paymentCod
+  }\n\n${itemLines}\n\n${tx.subtotal}: ${customerAmount(o, o.subtotal)}\n${tx.shipping}: ${
+    o.shippingFee === 0 ? tx.free : customerAmount(o, o.shippingFee)
+  }\n${tx.total}: ${customerAmount(o, o.total)}\n\n${tx.viewOrder}: ${o.viewOrderUrl}`;
+}
+
+export async function sendCustomerOrderConfirmation(fields: NewOrderEmailFields) {
+  if (!hasSmtpConfig()) return;
+  if (!fields.email) return;
+
+  try {
+    const transporter = getTransporter();
+    await transporter.sendMail({
+      from: `"VERITY GEAR" <${getMailFrom()}>`,
+      to: fields.email,
+      subject: CUSTOMER_TEXT[fields.locale].subject(fields.orderCode),
+      text: customerOrderEmailText(fields),
+      html: customerOrderEmailHtml(fields),
+    });
+  } catch (err) {
+    console.error("Failed to send customer order confirmation email:", err);
   }
 }

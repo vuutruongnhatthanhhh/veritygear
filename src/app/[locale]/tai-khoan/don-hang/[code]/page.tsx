@@ -4,6 +4,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { formatPrice } from "@/lib/format";
 import { getExchangeRate } from "@/lib/exchangeRate";
 import { localizedPath } from "@/lib/seo";
@@ -11,8 +12,15 @@ import type { OrderStatus } from "@/lib/types";
 
 export const metadata = { title: "Chi tiết đơn hàng — VERITY GEAR", robots: { index: false, follow: false } };
 
-export default async function OrderDetailPage({ params }: { params: Promise<{ code: string }> }) {
+export default async function OrderDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ code: string }>;
+  searchParams: Promise<{ t?: string }>;
+}) {
   const { code } = await params;
+  const { t: guestToken } = await searchParams;
   const locale = await getLocale();
   const t = await getTranslations("orderHistory");
   const tStatus = await getTranslations("orderStatus");
@@ -23,18 +31,31 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ co
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let order: any = null;
+
+  if (user) {
+    const { data } = await supabase
+      .from("orders")
+      .select("*, order_items(*)")
+      .eq("order_code", code)
+      .eq("user_id", user.id)
+      .single();
+    order = data;
+  } else if (guestToken) {
+    const admin = createAdminClient();
+    const { data } = await admin
+      .from("orders")
+      .select("*, order_items(*)")
+      .eq("order_code", code)
+      .eq("guest_token", guestToken)
+      .single();
+    order = data;
+  } else {
     const next = localizedPath(locale, `/tai-khoan/don-hang/${code}`);
     redirect({ href: { pathname: "/dang-nhap", query: { next } }, locale });
     return;
   }
-
-  const { data: order } = await supabase
-    .from("orders")
-    .select("*, order_items(*)")
-    .eq("order_code", code)
-    .eq("user_id", user.id)
-    .single();
 
   if (!order) notFound();
 

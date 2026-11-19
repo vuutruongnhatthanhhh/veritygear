@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import ScrollToTopButton from "@/components/ScrollToTopButton";
 import { CartProvider } from "@/components/providers/CartProvider";
 import { ExchangeRateProvider } from "@/components/providers/ExchangeRateProvider";
+import { GuestOrdersProvider } from "@/components/providers/GuestOrdersProvider";
 import { OrganizationJsonLd } from "@/components/seo/JsonLd";
 import { createClient } from "@/lib/supabase/public";
 import { getExchangeRate } from "@/lib/exchangeRate";
@@ -101,12 +102,14 @@ export default async function LocaleLayout({
       <OrganizationJsonLd />
       <NextIntlClientProvider>
         <ExchangeRateProvider rate={rate}>
-          <CartProvider>
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-            <ScrollToTopButton />
-          </CartProvider>
+          <GuestOrdersProvider>
+            <CartProvider>
+              <Header />
+              <main className="flex-1">{children}</main>
+              <Footer />
+              <ScrollToTopButton />
+            </CartProvider>
+          </GuestOrdersProvider>
         </ExchangeRateProvider>
       </NextIntlClientProvider>
     </>

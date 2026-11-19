@@ -3,6 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { localizedPath } from "@/lib/seo";
 
 export const metadata = { title: "Kết quả thanh toán — VERITY GEAR", robots: { index: false, follow: false } };
@@ -13,9 +14,9 @@ export default async function CheckoutResultPage({
   // "oc" (not "orderCode") — PayOS appends its own `orderCode` param (a
   // different value, its numeric code) to this URL on redirect, which would
   // collide with and overwrite a same-named param of ours.
-  searchParams: Promise<{ oc?: string; cancel?: string }>;
+  searchParams: Promise<{ oc?: string; cancel?: string; t?: string }>;
 }) {
-  const { oc, cancel } = await searchParams;
+  const { oc, cancel, t: guestToken } = await searchParams;
   const locale = await getLocale();
   const t = await getTranslations("checkout");
 
@@ -26,18 +27,30 @@ export default async function CheckoutResultPage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
+  let order: { order_code: string; payment_status: string } | null = null;
+
+  if (user) {
+    const { data } = await supabase
+      .from("orders")
+      .select("order_code, payment_status")
+      .eq("order_code", oc)
+      .eq("user_id", user.id)
+      .single();
+    order = data;
+  } else if (guestToken) {
+    const admin = createAdminClient();
+    const { data } = await admin
+      .from("orders")
+      .select("order_code, payment_status")
+      .eq("order_code", oc)
+      .eq("guest_token", guestToken)
+      .single();
+    order = data;
+  } else {
     const next = `${localizedPath(locale, "/thanh-toan/ket-qua")}?oc=${oc}`;
     redirect({ href: { pathname: "/dang-nhap", query: { next } }, locale });
     return;
   }
-
-  const { data: order } = await supabase
-    .from("orders")
-    .select("order_code, payment_status")
-    .eq("order_code", oc)
-    .eq("user_id", user.id)
-    .single();
 
   if (!order) notFound();
 
@@ -67,14 +80,21 @@ export default async function CheckoutResultPage({
       <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
         {!isCancelled && (
           <Link
-            href={{ pathname: "/thanh-toan/ket-qua", query: { oc: order.order_code } }}
+            href={{
+              pathname: "/thanh-toan/ket-qua",
+              query: guestToken ? { oc: order.order_code, t: guestToken } : { oc: order.order_code },
+            }}
             className="inline-flex h-13 items-center bg-ink px-8 text-[13px] font-semibold uppercase tracking-[0.14em] text-paper transition-transform hover:scale-[1.02]"
           >
             {t("refresh")}
           </Link>
         )}
         <Link
-          href={{ pathname: "/tai-khoan/don-hang/[code]", params: { code: order.order_code } }}
+          href={
+            guestToken
+              ? { pathname: "/tai-khoan/don-hang/[code]", params: { code: order.order_code }, query: { t: guestToken } }
+              : { pathname: "/tai-khoan/don-hang/[code]", params: { code: order.order_code } }
+          }
           className="inline-flex h-13 items-center border border-ink/20 px-8 text-[13px] font-semibold uppercase tracking-[0.14em] text-ink transition-colors hover:border-ink"
         >
           {t("viewOrder")}

@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { useCart } from "@/components/providers/CartProvider";
 import { useFormatPrice } from "@/components/providers/ExchangeRateProvider";
+import { useGuestOrders } from "@/components/providers/GuestOrdersProvider";
 import { placeOrder } from "@/app/[locale]/thanh-toan/actions";
 import { GhnAddressFields } from "./GhnAddressFields";
 
@@ -36,6 +37,7 @@ export default function CheckoutView({
   const tNav = useTranslations("nav");
   const { items, subtotal, clear } = useCart();
   const formatPrice = useFormatPrice();
+  const { addOrder } = useGuestOrders();
   const [state, action, pending] = useActionState(placeOrder, null);
   const [ghnFee, setGhnFee] = useState<number | null>(null);
   const [feeLoading, setFeeLoading] = useState(false);
@@ -47,12 +49,16 @@ export default function CheckoutView({
   const total = subtotal + shippingCost;
 
   useEffect(() => {
-    if (state?.orderCode) clear();
+    if (state?.orderCode) {
+      if (state.guestToken) addOrder(state.orderCode, state.guestToken);
+      clear();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state?.orderCode]);
 
   useEffect(() => {
     if (state?.paymentUrl) {
+      if (state.orderCode && state.guestToken) addOrder(state.orderCode, state.guestToken);
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setRedirecting(true);
       clear();
@@ -106,7 +112,11 @@ export default function CheckoutView({
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
           <Link
-            href={{ pathname: "/tai-khoan/don-hang/[code]", params: { code: state.orderCode } }}
+            href={
+              state.guestToken
+                ? { pathname: "/tai-khoan/don-hang/[code]", params: { code: state.orderCode }, query: { t: state.guestToken } }
+                : { pathname: "/tai-khoan/don-hang/[code]", params: { code: state.orderCode } }
+            }
             className="inline-flex h-13 items-center bg-ink px-8 text-[13px] font-semibold uppercase tracking-[0.14em] text-paper transition-transform hover:scale-[1.02]"
           >
             {t("viewOrder")}

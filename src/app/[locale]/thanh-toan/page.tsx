@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import { getLocale } from "next-intl/server";
-import { redirect } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import CheckoutView from "@/components/checkout/CheckoutView";
-import { localizedPath } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Thanh toán — VERITY GEAR",
@@ -23,15 +21,11 @@ export default async function CheckoutPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    const next = localizedPath(locale, "/thanh-toan");
-    redirect({ href: { pathname: "/dang-nhap", query: { next } }, locale });
-    return;
-  }
-
   const admin = createAdminClient();
   const [{ data: profile }, { data: settings }, { data: ghnSettings }, { data: termsSettings }] = await Promise.all([
-    supabase.from("profiles").select("full_name, phone, address").eq("id", user.id).single(),
+    user
+      ? supabase.from("profiles").select("full_name, phone, address").eq("id", user.id).single()
+      : Promise.resolve({ data: null }),
     supabase.from("shipping_settings").select("free_shipping_threshold, shipping_fee").eq("id", 1).single(),
     admin.from("ghn_settings").select("enabled").eq("id", 1).single(),
     supabase.from("order_terms_settings").select("url_vi, url_en").eq("id", 1).single(),
@@ -45,7 +39,7 @@ export default async function CheckoutPage() {
         fullName: profile?.full_name ?? "",
         phone: profile?.phone ?? "",
         address: profile?.address ?? "",
-        email: user.email ?? "",
+        email: user?.email ?? "",
       }}
       shipping={{
         freeShippingThreshold: settings?.free_shipping_threshold ?? DEFAULT_FREE_SHIPPING_THRESHOLD,

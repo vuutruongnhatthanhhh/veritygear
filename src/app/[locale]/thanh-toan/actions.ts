@@ -1,16 +1,22 @@
 "use server";
 
+import { randomUUID } from "crypto";
 import { headers } from "next/headers";
 import { getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { ghnCalculateFee } from "@/lib/ghn";
 import { getPayOS } from "@/lib/payos";
-import { sendNewOrderNotification } from "@/lib/orderNotification";
+import { sendNewOrderNotification, sendCustomerOrderConfirmation } from "@/lib/orderNotification";
 import { getExchangeRate } from "@/lib/exchangeRate";
 import { localizedPath } from "@/lib/seo";
 
-export type CheckoutState = { error?: string; orderCode?: string; paymentUrl?: string } | null;
+export type CheckoutState = {
+  error?: string;
+  orderCode?: string;
+  paymentUrl?: string;
+  guestToken?: string;
+} | null;
 
 const DEFAULT_FREE_SHIPPING_THRESHOLD = 1500000;
 const DEFAULT_SHIPPING_FEE = 35000;
@@ -54,7 +60,8 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { error: "Bạn cần đăng nhập để đặt hàng" };
+  const userId = user?.id ?? null;
+  const guestToken = userId ? null : randomUUID();
 
   const items = parseItems(formData.get("items_json") as string | null);
   if (items.length === 0) return { error: "Giỏ hàng đang trống" };
@@ -126,7 +133,8 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
   const { data: order, error: orderError } = await supabase
     .from("orders")
     .insert({
-      user_id: user.id,
+      user_id: userId,
+      guest_token: guestToken,
       full_name: fullName,
       phone,
       email,
@@ -165,6 +173,12 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
 
   if (itemsError) return { error: itemsError.message };
 
+  const origin = await siteOrigin();
+  const viewOrderPath = `${localizedPath(locale, `/tai-khoan/don-hang/${order.order_code}`)}${
+    guestToken ? `?t=${guestToken}` : ""
+  }`;
+  const viewOrderUrl = `${origin}${viewOrderPath}`;
+
   const emailFields = {
     orderCode: order.order_code,
     fullName,
@@ -182,19 +196,23 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
     paymentMethod,
     currency,
     exchangeRate,
+    locale: locale === "en" ? ("en" as const) : ("vi" as const),
+    viewOrderUrl,
   };
 
   if (paymentMethod === "cod") {
     await sendNewOrderNotification(emailFields);
-    return { orderCode: order.order_code };
+    await sendCustomerOrderConfirmation(emailFields);
+    return { orderCode: order.order_code, guestToken: guestToken ?? undefined };
   }
 
-  // Bank transfer: hold off on the notification email until PayOS confirms
-  // payment via webhook — send it now would mean unpaid orders get treated
-  // the same as confirmed ones.
+  // Bank transfer: hold off on both notification emails until PayOS confirms
+  // payment via webhook — sending them now would mean unpaid orders get
+  // treated the same as confirmed ones.
   try {
-    const origin = await siteOrigin();
-    const resultPath = `${localizedPath(locale, "/thanh-toan/ket-qua")}?oc=${order.order_code}`;
+    const resultPath = `${localizedPath(locale, "/thanh-toan/ket-qua")}?oc=${order.order_code}${
+      guestToken ? `&t=${guestToken}` : ""
+    }`;
     const paymentLink = await getPayOS().paymentRequests.create({
       orderCode: order.id,
       amount: total,
@@ -207,7 +225,7 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
       returnUrl: `${origin}${resultPath}`,
       cancelUrl: `${origin}${resultPath}`,
     });
-    return { paymentUrl: paymentLink.checkoutUrl };
+    return { paymentUrl: paymentLink.checkoutUrl, orderCode: order.order_code, guestToken: guestToken ?? undefined };
   } catch (err) {
     console.error("Failed to create PayOS payment link:", err);
     await admin.from("orders").delete().eq("id", order.id);
