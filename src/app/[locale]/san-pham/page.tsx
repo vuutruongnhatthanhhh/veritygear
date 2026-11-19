@@ -66,7 +66,7 @@ export default async function ShopPage({ params }: { params: Promise<{ locale: s
     badge: pick(p.badge_vi ?? "", p.badge_en ?? "") || undefined,
     description: pick(p.description_vi, p.description_en),
     specs: [],
-    isOutOfStock: p.is_out_of_stock,
+    isOutOfStock: locale === "en" ? p.is_out_of_stock_global : p.is_out_of_stock_vn,
   }));
 
   return (

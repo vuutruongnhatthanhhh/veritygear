@@ -34,7 +34,7 @@ export default async function FeaturedProducts() {
     badge: pick(p.badge_vi ?? "", p.badge_en ?? "") || undefined,
     description: pick(p.description_vi, p.description_en),
     specs: [],
-    isOutOfStock: p.is_out_of_stock,
+    isOutOfStock: locale === "en" ? p.is_out_of_stock_global : p.is_out_of_stock_vn,
   }));
 
   if (products.length === 0) return null;
