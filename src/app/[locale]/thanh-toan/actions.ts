@@ -130,7 +130,16 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
 
   const total = subtotal + shippingFee;
 
-  const { data: order, error: orderError } = await supabase
+  // Guest orders are inserted via the service-role client instead of the
+  // session-bound one — Postgres re-reads the row under RLS to satisfy
+  // `.select()` after an insert, and there's deliberately no anon SELECT
+  // policy on `orders` (order_code is guessable; an anon SELECT policy would
+  // let anyone enumerate every guest order's name/phone/address/email via
+  // the public anon key). Logged-in users keep using their own session
+  // client, unchanged.
+  const dbClient = userId ? supabase : admin;
+
+  const { data: order, error: orderError } = await dbClient
     .from("orders")
     .insert({
       user_id: userId,
@@ -160,7 +169,7 @@ export async function placeOrder(_prev: CheckoutState, formData: FormData): Prom
 
   if (orderError || !order) return { error: orderError?.message ?? "Không thể tạo đơn hàng" };
 
-  const { error: itemsError } = await supabase.from("order_items").insert(
+  const { error: itemsError } = await dbClient.from("order_items").insert(
     items.map((i) => ({
       order_id: order.id,
       product_slug: i.slug,
