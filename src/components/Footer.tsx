@@ -70,6 +70,20 @@ export default async function Footer() {
             />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-paper/60">{tagline}</p>
             <SocialLinks links={socialLinks} variant="dark" className="mt-6" />
+            <a
+              href="https://online.gov.vn/nen-tang/9f4d45af-9f0c-42ba-b22c-00b245fb0767"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-block max-w-full"
+            >
+              <Image
+                src="/images/logo/da-thong-bao-bo-cong-thuong.png"
+                alt={pick("Đã thông báo Bộ Công Thương", "Notified to the Ministry of Industry and Trade")}
+                width={230}
+                height={86}
+                className="h-auto w-48"
+              />
+            </a>
           </div>
 
           {columns.map((col) => (
